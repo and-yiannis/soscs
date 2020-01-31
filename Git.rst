@@ -261,18 +261,87 @@ Remote Branching
 Rebasing
 ********
 
-Basic rebase
+**Basic rebase**
 
-:code:`git checkout branch1`
+.. code-block:: bash
 
-:code:`git rebase branch2`
-    * The above will find all the changes to branch1 after its last common ancestor with branch2 and replay them at the head of branch2. The base of branch1 therefore, will be the head of branch2 (rebase)
+  git checkout dev
+  
+  git rebase master
 
-:code:`git rebase --onto br1 br2 br3`
-    * This will take all the changes of br3 after its last common ancestor with br2 and replay them on top of br1. In other words it rebases br3 after br2 on top of br1.  
+The above will find all the changes to dev after its last common ancestor with master and replay them at the head of master. The new base of dev therefore, will be the head of master (rebase)
 
-:code:`git rebase -i HEAD~n`
-    * A method for squashing the last n commits into 1. Best not to apply it on the main branch. After squashing, probably have to delete the old branch in the server, with :code:`git push origin --delete <branch_name>` and push the new branch upstream with :code:`git push --set-upstream origin <branch_name>`
+**Rebase onto**
+
+.. code-block:: bash
+
+  git rebase --onto br1 br2 br3
+
+This will take all the changes of br3 after its last common ancestor with br2 and replay them on top of br1. In other words it rebases br3 after br2 on top of br1.  
+
+
+**Squashing commits with rebase**
+
+Suppose the following commits in branch
+
+`c1 -- c2 -- c3 -- c4 -- HEAD`
+
+and that we want to squash commits `c3` and `c4`. This can be done interactively using 
+
+.. code-block:: bash
+
+  git rebase -i HEAD~3
+
+or
+
+.. code-block:: bash
+
+  git rebase -i c2
+
+(where c2 is the commit number)
+
+An interactive window will then open, where git asks if we want to squash, keep or even drop a commit. The commits will appear in a list as 
+
+.. code-block:: bash
+
+  pick c3 <commit_message>
+  pick c4 <commit_message>
+  pick HEAD <commit_message>
+  
+  # Rebase 42e44ea..bbdf516 onto 42e44ea (4 commands)
+  #
+  # Commands:
+  # p, pick = use commit
+  # r, reword = use commit, but edit the commit message
+  # e, edit = use commit, but stop for amending
+  # s, squash = use commit, but meld into previous commit
+  # f, fixup = like "squash", but discard this commit's log message
+  # x, exec = run command (the rest of the line) using shell
+  # d, drop = remove commit
+  #
+  # These lines can be re-ordered; they are executed from top to bottom.
+  #
+  # If you remove a line here THAT COMMIT WILL BE LOST.
+  #
+  # However, if you remove everything, the rebase will be aborted.
+  #
+  # Note that empty commits are commented out
+  
+
+The top commit (c3) cannot be squashed. If it needs to be removed, simply delete the line. 
+
+If you simply want to squash the 3 commits into 1, change the 1st 3 lines to 
+
+.. code-block:: bash
+
+  r c3 <commit_message>
+  f c4 <commit_message>
+  f HEAD <commit_message>
+  
+This will squash the HEAD and c4 into c3, and will open a new interactive window for editing the overall commit message. 
+
+This method should be used for branches that haven't been pushed to the server. 
+
 
 Stashing
 ********
