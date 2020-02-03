@@ -114,27 +114,6 @@ Change files
     * Return to the master branch. 
 
 
-Remotes
-*******
-
-:code:`git remote -v`
-    * Show which remotes you are using with aliases
-
-:code:`git remote show`
-    * shows information about the remote repositories in use 
-
-:code:`git remote show <repository_short_name>`
-    * shows information about the remote repository
-
-:code:`git ls-remote`
-    * list all remote references, branches, tags etc
-
-:code:`git remote add <shortname> <url>`
-    * Add the remote in url with the shortname <shortname>    
-
-:code:`git fetch <shortname>`
-
-
 Tags
 ****
 
@@ -235,6 +214,25 @@ Branching
     * Merges the branch <branchname> into the current one
 
 
+Remotes
+*******
+
+:code:`git remote -v`
+    * Show which remotes you are using with aliases
+
+:code:`git remote show`
+    * shows information about the remote repositories in use 
+
+:code:`git remote show <repository_short_name>`
+    * shows information about the remote repository
+
+:code:`git ls-remote`
+    * list all remote references, branches, tags etc
+
+:code:`git remote add <shortname> <url>`
+    * Add the remote in url with the shortname <shortname>    
+
+
 Remote Branching
 ****************
 
@@ -254,8 +252,11 @@ Remote Branching
 :code:`git push origin --delete serverfix`
     * deletes serverfix online
 
-:code:`git fetch -p origin`
-    * When user1 deletes a branch online, this might still appear in the pointers of user2. In this case, user2 can prune the local "cache" of remote branches using the above. 
+:code:`git fetch`
+    * Downloads objects and references from the repository
+
+:code:`git fetch -p` or :code:`--prune`
+    * When a branch is deleted on the server, it might still appear in the pointers of the local repository. Pruning removes these references. 
 
 
 Rebasing
