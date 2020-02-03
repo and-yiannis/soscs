@@ -69,3 +69,27 @@ To enable typescript support for vim run the following
 .. code-block:: bash
 
     git clone https://github.com/leafgarland/typescript-vim.git ~/.vim/pack/typescript/start/typescript-vim
+
+
+.swp storage directory
+**********************
+
+In case you want to store the .swp files in a directory different than the directory where the file is edited resides, first create a directory, e.g.
+
+.. code-block:: bash
+
+    mkdir ~/vimview
+
+and then add in the :code:`~/.vimrc`
+
+.. code-block:: bash
+
+    set directory^=$HOME/vimswap//
+
+To disable the creation of :code:`.swp` files, use
+
+.. code-block:: bash
+
+    set noswapfile
+
+   
