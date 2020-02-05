@@ -251,6 +251,24 @@ Ls
 **
 :code:`-i` shows the file inode.
 
+dircolors
+*********
+
+The colors used by :code:`ls` can be modified using :code:`dircolors`. The coloring scheme is stored in the :code:`LS_COLORS` environment variable. 
+
+Use 
+
+.. code-block:: bash
+
+    dircolors -p > ~/.dircolors
+
+to export the coloring scheme to the file :code:`~/.dircolors`. After modifying the contents of the file, load its contents to the :code:`LS_COLORS` variable using
+
+.. code-block:: bash
+
+    dircolors ~/.dircolors
+
+
 Installing in the home folder
 *****************************
 
