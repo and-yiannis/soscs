@@ -2,280 +2,130 @@
 Python
 ######
 
-----------------------------------------------------------------------
-# --- General ---
-----------------------------------------------------------------------
-dir() shows the variables loaded in memory
-dir(C) also gives the methods of an object
-del variable deletes the variable
-
-----------------------------------------------------------------------
-# --- Modules ---
-----------------------------------------------------------------------
-import module as m : imports module
-reload(m)          : reloads module in variable m
-This works in python 2 only.
-
-to check whether object a contains a method/datatype b
-'b' in dir(a)
-
-execfile runs a whole file 
-
-Reloading with ipython
-
-Type at the beginning of the ipython session 
-%load_ext autoreload
-%autoreload 2
-
-
-----------------------------------------------------------------------
-# --- reshaping lists ---
-----------------------------------------------------------------------
-zip built in function
-
-if you have a = [1,2,3] and b = [4,5,6] and you want to make [1,4,2,5,3,6] 
-it can be done with 
-[item for k in zip(a,b) for item in k]
-
-zip(a,b) will return 
-[(1,4),(2,5),(3,6)] 
-
-and the list comprehension above can be read as
-
-for k in zip(a,b)
-  for item in k
-     add item in the list
-
-
-----------------------------------------------------------------------
-# --- debugging ---
-----------------------------------------------------------------------
-import pdb
-
-enter in the code pdb.set_trace() if you want a break point
-
-you can call a function using pdb.run('function(a,b)')
-
-once in the debugger,
-s steps in
-n steps over
-b 101 sets a breakpoint in line 101
-c continues
-q quits
-
-
-----------------------------------------------------------------------
-# --- plotting ---
-----------------------------------------------------------------------
-plt.ion() allows to use the terminal while plotting
-plt.figure() allows the creation of a second figure etc. 
-
-
-----------------------------------------------------------------------
-# --- standalone applications ---
-----------------------------------------------------------------------
-to create standalone applications check
-http://pythonhosted.org/py2app/tutorial.html
-
-first make the setup file, including any extra files (e.g. images directory)
-py2applet --make-setup Myapplication.py images
-
-remove any previous builds
-rm -rf build dist
-
-build the application
-python setup.py py2app -A
-
-the -A flag builds it in 'alias' mode for testing. To build the final thing ommit '-A', i.e.
-python setup.py py2app 
-
-
-----------------------------------------------------------------------
-# --- Write a matrix as binary data to a file ---
-----------------------------------------------------------------------
-suppose that Outputs is a m x n array
-
-import numpy as np
-import struct
-
-# open file
-fid = file('testpy.bin','wb') 
-
-# get number of elements
-n_elem = Outputs.size
-
-# convert matrix to a m x n vector, in column major order ('F')
-b = Outputs.reshape(n_elem, order='F')
-
-# write to file 
-fid.write(struct.pack('d'*n_elem, *b))
-'d' is for double precision
-
-# close file
-fid.close()
- 
-----------------------------------------------------------------------
-# --- Import csv ---
-----------------------------------------------------------------------
-a = np.genfromtxt('Inputs.csv',delimiter=",",dtype=float)
-
-
-----------------------------------------------------------------------
-# --- Change directory to scripts own directory ---
-----------------------------------------------------------------------
-import os
-import sys
-
-abspath = os.path.abspath(sys.argv[0])
-# abspath = os.path.abspath(__file__) # This can be used alternatively
-dname = os.path.dirname(abspath)
-os.chdir(dname)
-
-----------------------
-# --- Unfold lists ---
-----------------------
-if a = (q,w,e,r,t)
-and a function myfun takes 5 arguments, 
-myfun(*a) will unfold the tuple and pass each element as a variable to the function
-
--------------------------------------
-# --- Find the data type of an object
--------------------------------------
-type(a) returns the data type (list, dict, tuple etc)
-
-a.__class__() returns the class of an object
-
-----------------------------
-Difference between is and ==
-----------------------------
-is checks whether two objects are equal 
-== checks whether the values are equal
-
-a = 1234
-b = 1234
-b is a -> false 
-b == a -> true
-
-HOWEVER! for small integers (e.g. 1) python caches small integer objects (?) and both the above tests would return true!!
-'is' returns true if the operands are represented by the same object in memory. This is not always the case with objects that compare equal with ==
-
-----------------------------
-Regular expressions
-----------------------------
-re.search() finds the first instance of an expression
-re.finditer() finds all the instances of an expression but returns an iterator
-re.match() matches at the beginning of a string. re.search() matches anywhere.
-
-let a = re.search('texttobeignored(texttobematched1)texttobeignored(texttobematched2)', texttobesearched)
-if the search is successful, then
-a.group(0) will be texttobeignoredtexttobematched1texttobeignoredtexttobematched2
-a.group(1) will be texttobematched1
-a.group(2) will be texttobematched2
-a.span(0) will be the limits of a.group(0)
-a.span(1) will be the limits of a.group(1) etc.
-
-------------------------
-read all lines in a file
-------------------------
-with open('filename.txt') as f:
-    for line in f:
-        do something with line
-
-
-----------------------------
-ipython vim integration
-----------------------------
-create a profile using 
-$ ipytthon profile create
-
-then open the file 
-~/.ipython/profile_default/ipython_config.py
-
-and find and uncomment the line
-c.TerminalInteractiveShell.editing_mode = 'vi'
-
-
-----------------------------
 Tutorial
-----------------------------
---- Section 3
----+++ Calculator
-// does floor division
-% is the remainder
-** calculates powers
-_ stores the last result shown on the interpreter
-j creates complex numbers
+########
 
----+++ Strings
--1 starts counting from the right
-Slice indices have defaults: [2:] means from 2 to the end, [:2] means from 0 to 1 (2 excluded).
+Section 3
+*********
+
+**Calculator**
+
+
+* :code:`//` does floor division
+* :code:`%` is the remainder
+* :code:`**` calculates powers
+* :code:`_` stores the last result shown on the interpreter
+* :code:`j` creates complex numbers
+
+**Strings**
+
+:code:`-1` starts counting from the right
+
+Slice indices have defaults: :code:`[2:]` means from 2 to the end, :code:`[:2]` means from 0 to 1 (2 excluded).
+
 Strings are immutable, you cannot assign values to individual locations
-len(s) returns the length of a string
-The only difference between ' and " is in '...' you need to escape ' but not the " and vice versa.
 
------------------
---- Section 4 ---
------------------
----+++ if
-if   :
-    ...
-elif   :
-    ...
-elif   :
-    ...
-else:
+:code:`len(s)` returns the length of a string
+
+
+Section 4
+*********
+
+**if**
+
+.. code-block:: python
+
+  if   :
+      ...
+  elif   :
+      ...
+  elif   :
+      ...
+  else:
     
----+++ for
-for iterates over the items of any sequence (list or a string)
-for w in words[:]:
-   makes a copy of words and changes of words within the loop do not affect it.
-This would not be true in 'for w in words:'
+**for**
 
----+++ range
-range(start, end, step)
+for iterates over the items of any sequence (list or a string)
+
+.. code-block:: python
+
+  for w in words[:]:
+
+makes a copy of words and changes of words within the loop do not affect it.
+
+This would not be true in
+
+.. code-block:: python
+
+ for w in words:
+
+**range**
+
+:code:`range(start, end, step)`
+
 end is never included, all numbers can be negative
 
----+++ else clause on loops
+**else clause on loops**
+
 executes when a loop finishes normally (i.e. not broken by a 'break' statement
 
----+++ pass statement
+**pass statement**
+
 does nothing!
 
----+++ functions
-def fib(n):
-    """ this is a docstring """
-docstring: a string that follows the function's definition and are used to automatically produce documentation. 
+**functions**
+
+.. code-block:: python
+
+  def fib(n):
+      """ this is a docstring """
+
+docstring is a string that follows the function's definition and are used to automatically produce documentation. 
+
 The execution of a function introduces a local 'symbol table'
+
 arguments are passed by 'call by object reference'. The passed objects are mutable.
 
----+++ More on functions
 The in keyword checks whether a sequence contains an element or not 
+
 The default arguments are evaluated only once (at the first function call).
 
----+++ Keyword arguments
+**Keyword arguments**
+
 keyword arguments must follow positional arguments
 
-def func(*arguments, **keywords):
+.. code-block:: python
+
+  def func(*arguments, **keywords):
+
 arguments will be a tuple with all positional arguments,
+
 keywords will be a dictionary with all keyword arguments. 
 
-*a unpacks tuples, or lists
-**keywords unpacks dictionaries
+`*a` unpacks tuples, or lists
 
----+++ Documentation
-The first line should always be ashort, consice summary of the object's purpose
+`**keywords` unpacks dictionaries
 
----+++ Coding style
+**Documentation**
+
+The first line should always be a short, consice summary of the object's purpose
+
+**Coding style**
+
 Use 4-space indentation, no tabs
+
 Lines should not exceed 79 characters
+
 Use blank lines to separate functions, classes and larger blocks of code
+
 Use spaces around operators and after commas, but not directly inside bracketing constructs, e.g. a = f(1, 2) + g(3, 4)
+
 Name classes and functions consistently e.g. classes with capitalised first letter of each word, functions separate with underscores.
 
 
-----------------------------------
---- Chapter 5. Data structures ---
-----------------------------------
+Chapter 5. Data structures
+**************************
+
 ---+++ Lists
 list.append(x) is the same as list[len(list):] = [x]
 list.extend(L) is the same as list(len(list):] = L
@@ -344,9 +194,9 @@ will return the key value pairs
 If needing to change a list while looping through it, make a copy first.
 
 
---------------------------
---- Section 6. Modules ---
---------------------------
+Section 6. Modules
+******************
+
 reload() reloads a module, if it has been changed
 sys.path shows the path where python searches for modules
 
@@ -357,9 +207,10 @@ The module complie all can create .pyc (or .pyo) files for all modules in a dire
 Packages are a way of structuring Python’s module namespace by using “dotted module names”
 
 
---------------------------------
---- Section 7 I/O formatting ---
---------------------------------
+
+Section 7 I/O formatting
+************************
+
 .format is the new method for formating strings
 'string ' % (args) is the old method, much like a sprintf
 
@@ -379,9 +230,10 @@ f.close                   (closes the file)
 json module writes and reads json files
 
 
----------------------------------------
---- Section 8 Errors and exceptions ---
----------------------------------------
+
+Section 8 Errors and exceptions
+*******************************
+
 
 Error is a syntax error (syntactic)
 
@@ -409,9 +261,10 @@ with open('file.txt') as f:
 list(iter_obj)
 dict(list(iter_obj)) creates a dictionary.
 
---------------------------
---- Section 9. Classes ---
---------------------------
+
+Section 9. Classes
+******************
+
 Classes have two kinds of attribute names: data attributes and methods
 
 Data attributes can be added after instantantiation
@@ -524,135 +377,14 @@ Generators
     g
 
 
--------------------------
---- Encoding Decoding ---
--------------------------
-A string s can be turned into bytes with s.encode()
-    >s = 'hello'
-    >s
-      'hello'
-    >b = s.encode()
-    >b
-      b'hello'
 
-A bytes object can be turned to a string with b
-    >b.decode()
-      'hello'
-
-A string can be turned to a list of integers with list(b)
-    >list(b)
-      [104, 101, 108, 108, 111]
-
-A list of integers can be turned to bytes with bytes(l)
-    >bytes([104, 101, 108, 108, 111])
-      b'hello'
-
-
---------------------------
---- Bitwise operations ---
---------------------------
-
-bin() 
-    returns the binary form of a number
-hex() 
-    returns the hexadecimal form of a number
-int(x, base=y)
-    converts the number from base y to base 10
-~
-    negation of a number
-<<
-    left shift
->> 
-    right shift
-^
-    bitwise xor
-&
-    bitwise and 
-|   
-    bitwise or
-
-
---------------------------------
---- Short circuit evaluation ---
---------------------------------
-'and' and 'or' are short circuit operators: if the first operand suffices to 
-determine the expression, the second is not evaluated
-'&' and '|'    are eager operators: both are evaluated anyway.
-
-Example
-x = 0
-
-if x > 0 and int(3/x) > 0 : 
-    print("ok")
-# Works, int(3/x) > 0 never gets evaluated, x > 0 is enough 
-to determine that the whole expression is false
-
-if x > 0 & int(3/x) > 0 :
-    print("ok")
-# Does not work, int(3/x) > 0 gets executed anyway and raises an error.
-
-------------------------
---- print formatting ---
-------------------------
-np.set_printoptions(threshold=np.nan)
-pd.options.display.float_format = '{:,.2f}'.format
-
----------------------
---- line profiler ---
----------------------
-git clone https://github.com/rkern/line_profiler.git
-python setup.py build
-python setup.py install
-
-Decorate the function you want to profile with
-@profile
-
-run the profiler with 
-kernprof -l file_to_profile.py
-
-Print the results with 
-python -m line_profiler file_to_profile.py.lprof 
-
-
-----------------------------
---- virtual environments ---
-----------------------------
-
-.. code-block:: bash
-
-    python -m venv env
-
-    source env/bin/activate
-
-
-AWS cli
-*******
-First start a new virtual environment as shown above. 
-
-Then upgrade pip. 
-
-.. code-block:: bash
-
-    pip install --upgrade pip
-
-Install `awscli`
-
-.. code-block:: bash
-
-    pip install --upgrade awscli
-
-Check the aws version
-
-.. code-block:: bash
-
-    aws --version 
-
-Run `aws configure` and enter your credentials
-
-
+Pandas
+######
 
 
 Chapter 2
+*********
+
     ? before or after a variable gives help about it.
     ?? prints the source code too!
     %run scriptname runs the script
@@ -690,8 +422,11 @@ Chapter 2
         dreload() function of ipythons deep (recursively) reloads modules
     Configuration
         ~/.ipython/profile_default/ipython_config.py
---------------------------------------------------------------------------------
+
+
 Chapter 3
+*********
+
     ndarray: a multidimensional array object
     shape
     dtype
@@ -811,8 +546,9 @@ Chapter 3
     Combinatorics
     scipy.misc.comb
 
---------------------------------------------------------------------------------
 Chapter 4
+*********
+
 Series
     obj.values
     obj.index
@@ -1014,8 +750,9 @@ DataFrame
         pd.MultiIndex.from_arrays([['US', 'US', 'US', 'JP', 'JP'],
            [1, 3, 5, 1, 3]], names = ['cty', 'tenor'])
 
---------------------------------------------------------------------------------
 Chapter 5
+*********
+
 
     read_csv
             read csv files
@@ -1040,18 +777,275 @@ Chapter 5
                  skip_footer=38, parse_cols=[2,3,4,5], na_values='...')
  
 
+Plotting
+********
 
 Pyplot
-        import matplotlib.pyplot as plt
-        plt.ion()          interactive on
-        plt.title()        prints title
-        plt.imshow()       shows images
-        plt.colorbar()     shows colorbar
-        plt.set_cmap('')   sets the colormap
+======
 
 
---------------------------------------------------------------------------------
+Start by importing :code:`pyplot`
+
+.. code-block:: python
+
+  import matplotlib.pyplot as plt
+
+
+Create a new figure
+
+.. code-block:: python
+
+  fig = plt.figure()
+
+
+Add a subplot to the newly created figure. 
+
+.. code-block:: python
+
+  ax1 = fig.add_subplot(1)
+
+
+The two commands can be combined in one as 
+
+.. code-block:: python
+
+  fig, axes = plt.subplots(2, 2)
+
+will create a new figure with a 2 by 2 grid of subplots. The handles to the subplots are given in axes which is now a list of lists. 
+
+
+Data can be added to subplots as 
+
+.. code-block:: python
+
+  ax1.plot(x, 'k--')
+  ax2.hist(randn(500), bins=50, color='k', alpha=0.5)
+  ax2.clear()
+
+
+Multiple plots can share axes:
+
+.. code-block:: python
+
+  fig, axes = plt.subplots(2, 2, sharex=True, sharey=True)
+
+
+White spaces around multiple plots can be adjusted
+
+
+.. code-block:: python
+
+  fig.subplots_adjust(wspace=0, hspace=0)
+
+
+You can choose a drawstyle
+
+.. code-block:: python
+
+  ax1.plot(data 'k-', drawstyle='steps-post')
+
+You can add a label to each line in a plot 
+
+.. code-block:: python
+
+  ax1.plot(data.cumsum(), 'k--', label='Default')
+
+and then show the legend
+
+.. code-block:: python
+
+  ax1.legend(loc='best')
+
+and its location can be set manually using
+
+.. code-block:: python
+
+  ax.legend(loc=(0.8, 0))
+  ax.legend(loc='lower right')
+
+Ticks can be added using
+
+.. code-block:: python
+
+  ticks = ax1.set_xticks([0, 250, 500, 750, 1000])
+  labels = ax1.set_xticklabels(['one', 'two', 'three', 'four', 'five'],
+                               rotation=30, fontsize='small')
+
+The subplot title can be set as 
+
+.. code-block:: python
+
+  ax1.set_title('My first matplotlib plot')
+
+The x and y labels 
+
+.. code-block:: python
+
+  ax1.set_xlabel('x-label')
+  ax1.set_ylabel('y-label')
+
+The limits to the axes can be set as
+
+.. code-block:: python
+
+  ax1.set_ylim(-3, 9)
+
+
+Annotations can be added as 
+
+.. code-block:: python
+
+  ax1.annotate(label, xy=(<location_of_point_to_annotate>),
+               xytext=(<location_of_text>),
+               arrowprops=dict(facecolor='black'),
+               horizontalalignment='center', verticalalignment='top')
+    
+
+Shapes can be added to the plot as
+
+.. code-block:: python
+
+  rect = plt.Rectangle((0.25, 0.35), 0.5, 0.25, color='k', alpha=0.3)    
+  circ = plt.Circle((0.7, 0.6), 0.15, color='b', alpha=0.3)
+  pgon = plt.Polygon([[0.15, 0.15], [0.35, 0.4], [0.2, 0.6]],
+                     color='g', alpha=0.5)
+  ax1.add_patch(rect)
+  ax1.add_patch(circ)
+  ax1.add_patch(pgon)
+
+Properties can be set in batches using
+
+.. code-block:: python
+
+  props = {
+    'title': 'My first matplotlib plot',
+    'xlabel': 'Stages'
+  }
+  ax.set(**props)
+
+
+Pandas
+======
+
+Series
+
+.. code-block:: python
+
+  s = pd.Series(...)
+  s.plot()
+
+Dataframes 
+
+.. code-block:: python
+
+  df = pdDataFrame(...)
+  df.plot()
+
+You can place a plot in a specific subplot
+
+.. code-block:: python
+
+  fig, ax = plt.subplots(1)
+  s.plot(ax=ax)
+
+Different plot types
+
+.. code-block:: python
+
+  s.plot() # regular plot
+  s.plot.bar() # bars
+  s.plot.hist() # histogram
+
+  s.plot(kind='bar', ax=axes[0], color='k', alpha=0.7)
+  s.plot(kind='barh', ax=axes[1], color='k', alpha=0.7)
+
+  df.plot(kind='barh', stacked=True, alpha=0.5)
+
+
+Seaborn
+=======
+
+Import seaborn
+
+.. code-block:: python
+
+  import seaborn as sns
+
+Barplots
+
+.. code-block:: python
+
+  sns.barplot(x= ,y= , data= , orient= )
+
+Distribution plots (plots an estimage of the pdf and a histogram). 
+
+.. code-block:: python
+
+  sns.distplot(values, bins=100, color='k')
+
+Regression scatter plots
+
+.. code-block:: python
+
+  sns.regplot('m1', 'unemp', data=trans_data)
+
+Pair plots
+
+.. code-block:: python
+
+  sns.pairplot(trans_data, diag_kind='kde', plot_kws={'alpha': 0.2})
+
+Categorical plots
+
+.. code-block:: python
+
+  sns.catplot(x='day', y='tip_pct', hue='time', col='smoker',
+               kind='bar', data=tips[tips.tip_pct < 1])
+
+
+The following sets the background for a plot.
+
+.. code-block:: python
+
+  sns.set(style={"darkgrid", "whitegrid", "dark"
+                 "white", "ticks"})
+
+Even though this is set using seaborn, it also applies to regular pyplot and pandas plots. 
+
+#%%
+from bokeh.plotting import figure, output_file, show
+
+x = [1, 2, 3, 4, 5]
+y = [6, 7, 2, 4, 5]
+output_file("lines.html")
+p = figure(title="simple line example", x_axis_label='x', y_axis_label='y')
+p.line(x, y, legend="Temp.", line_width=5)
+show(p)
+
+
+
+plt.ion()          interactive on
+plt.title()        prints title
+plt.imshow()       shows images
+plt.colorbar()     shows colorbar
+plt.set_cmap('')   sets the colormap
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Chapter 7
+*********
+
     merge, concat, combine_first
 
     merge
@@ -1119,8 +1113,10 @@ Chapter 7
                 methods, including regular expressions.
 
 
---------------------------------------------------------------------------------
+
 Chapter 9
+*********
+
 
     GroupBy
         df.groupby(df['key'])   (use the same df)
@@ -1167,15 +1163,19 @@ Chapter 9
         Most generic, applies the fun to each series in the data frame
         and attempts to concatenate the results.
 
---------------------------------------------------------------------------------
+
 Chapter 11
+**********
+
     Align
         df1.align(df2, join='inner')
             aligns frames according to index 
 
 
---------------------------------------------------------------------------------
+
 Display options
+***************
+
 Max number of rows
     pd.options.display.max_rows = 999
 Float formatting
@@ -1239,12 +1239,12 @@ JWT
 JWT authentication is a method for verifying that a user that uses a webservice is the person they claim they are. It consists of 2 parts the encoding and the decoding.
 
 Encoding
-%%%%%%%%
+********
 
 The encoding part needs the `payload`, which is a dictionary, and the `secret key` that is a string that should be known only to the server. The encoding procedure results to a JWT key that is used for further authentications.
 
 Decoding
-%%%%%%%%
+********
 
 In the decoding part, the user that wants to be authenticated provides the JWT key and their user identity. The decoding process takes the JWT key and the secret key and if successful will return the `payload`. If the `payload` is what we think it should be then the authentication is successful. The decoding can fail for a number of reasons, the most common of which are 1) a wrong key was provided or 2) the JWT token has expired. These errors should be caught and dealt with accordingly. 
 
@@ -1300,7 +1300,339 @@ The authentication token is passed in the call in the headers of the call, which
 
     headers={"Authorization": 'Bearer ' + auth_token}
 
-Matplotlib
-**********
+General
+#######
 
-    
+dir() shows the variables loaded in memory
+dir(C) also gives the methods of an object
+del variable deletes the variable
+
+
+Modules
+#######
+
+import module as m : imports module
+reload(m)          : reloads module in variable m
+This works in python 2 only.
+
+to check whether object a contains a method/datatype b
+'b' in dir(a)
+
+execfile runs a whole file 
+
+Reloading with ipython
+
+Type at the beginning of the ipython session 
+%load_ext autoreload
+%autoreload 2
+
+
+
+Reshaping lists
+###############
+
+zip built in function
+
+if you have a = [1,2,3] and b = [4,5,6] and you want to make [1,4,2,5,3,6] 
+it can be done with 
+[item for k in zip(a,b) for item in k]
+
+zip(a,b) will return 
+[(1,4),(2,5),(3,6)] 
+
+and the list comprehension above can be read as
+
+for k in zip(a,b)
+  for item in k
+     add item in the list
+
+
+Debugging
+#########
+
+import pdb
+
+enter in the code pdb.set_trace() if you want a break point
+
+you can call a function using pdb.run('function(a,b)')
+
+once in the debugger,
+s steps in
+n steps over
+b 101 sets a breakpoint in line 101
+c continues
+q quits
+
+
+
+Plotting
+########
+
+plt.ion() allows to use the terminal while plotting
+plt.figure() allows the creation of a second figure etc. 
+
+
+
+Standalone applications 
+########################
+
+to create standalone applications check
+http://pythonhosted.org/py2app/tutorial.html
+
+first make the setup file, including any extra files (e.g. images directory)
+py2applet --make-setup Myapplication.py images
+
+remove any previous builds
+rm -rf build dist
+
+build the application
+python setup.py py2app -A
+
+the -A flag builds it in 'alias' mode for testing. To build the final thing ommit '-A', i.e.
+python setup.py py2app 
+
+
+Write a matrix as binary data to a file
+#######################################
+
+suppose that Outputs is a m x n array
+
+import numpy as np
+import struct
+
+# open file
+fid = file('testpy.bin','wb') 
+
+# get number of elements
+n_elem = Outputs.size
+
+# convert matrix to a m x n vector, in column major order ('F')
+b = Outputs.reshape(n_elem, order='F')
+
+# write to file 
+`fid.write(struct.pack('d'*n_elem, *b))`
+'d' is for double precision
+
+# close file
+fid.close()
+ 
+Import csv
+##########
+
+a = np.genfromtxt('Inputs.csv',delimiter=",",dtype=float)
+
+
+
+Change directory to scripts own directory
+#########################################
+
+import os
+import sys
+
+abspath = os.path.abspath(sys.argv[0])
+# abspath = os.path.abspath(__file__) # This can be used alternatively
+dname = os.path.dirname(abspath)
+os.chdir(dname)
+
+Unfold lists
+############
+
+if a = (q,w,e,r,t)
+and a function myfun takes 5 arguments, 
+`myfun(*a) will unfold the tuple and pass each element as a variable to the function`
+
+
+Find the data type of an object
+###############################
+
+type(a) returns the data type (list, dict, tuple etc)
+
+a.__class__() returns the class of an object
+
+Difference between is and ==
+############################
+
+is checks whether two objects are equal 
+== checks whether the values are equal
+
+a = 1234
+b = 1234
+b is a -> false 
+b == a -> true
+
+HOWEVER! for small integers (e.g. 1) python caches small integer objects (?) and both the above tests would return true!!
+'is' returns true if the operands are represented by the same object in memory. This is not always the case with objects that compare equal with ==
+
+
+Regular expressions
+###################
+
+re.search() finds the first instance of an expression
+re.finditer() finds all the instances of an expression but returns an iterator
+re.match() matches at the beginning of a string. re.search() matches anywhere.
+
+let a = re.search('texttobeignored(texttobematched1)texttobeignored(texttobematched2)', texttobesearched)
+if the search is successful, then
+a.group(0) will be texttobeignoredtexttobematched1texttobeignoredtexttobematched2
+a.group(1) will be texttobematched1
+a.group(2) will be texttobematched2
+a.span(0) will be the limits of a.group(0)
+a.span(1) will be the limits of a.group(1) etc.
+
+read all lines in a file
+########################
+
+
+with open('filename.txt') as f:
+    for line in f:
+        do something with line
+
+
+ipython vim integration
+#######################
+
+create a profile using 
+$ ipytthon profile create
+
+then open the file 
+~/.ipython/profile_default/ipython_config.py
+
+and find and uncomment the line
+c.TerminalInteractiveShell.editing_mode = 'vi'
+
+
+Encoding Decoding
+#################
+
+
+
+A string s can be turned into bytes with s.encode()
+    >s = 'hello'
+    >s
+      'hello'
+    >b = s.encode()
+    >b
+      b'hello'
+
+A bytes object can be turned to a string with b
+    >b.decode()
+      'hello'
+
+A string can be turned to a list of integers with list(b)
+    >list(b)
+      [104, 101, 108, 108, 111]
+
+A list of integers can be turned to bytes with bytes(l)
+    >bytes([104, 101, 108, 108, 111])
+      b'hello'
+
+
+
+Bitwise operations 
+##################
+
+
+
+bin() 
+    returns the binary form of a number
+hex() 
+    returns the hexadecimal form of a number
+int(x, base=y)
+    converts the number from base y to base 10
+~
+    negation of a number
+<<
+    left shift
+>> 
+    right shift
+^
+    bitwise xor
+&
+    bitwise and 
+|   
+    bitwise or
+
+
+Short circuit evaluation
+########################
+
+'and' and 'or' are short circuit operators: if the first operand suffices to 
+determine the expression, the second is not evaluated
+'&' and '|'    are eager operators: both are evaluated anyway.
+
+Example
+x = 0
+
+if x > 0 and int(3/x) > 0 : 
+    print("ok")
+# Works, int(3/x) > 0 never gets evaluated, x > 0 is enough 
+to determine that the whole expression is false
+
+if x > 0 & int(3/x) > 0 :
+    print("ok")
+# Does not work, int(3/x) > 0 gets executed anyway and raises an error.
+
+
+print formatting
+################
+
+np.set_printoptions(threshold=np.nan)
+pd.options.display.float_format = '{:,.2f}'.format
+
+
+line profiler
+#############
+
+
+git clone https://github.com/rkern/line_profiler.git
+python setup.py build
+python setup.py install
+
+Decorate the function you want to profile with
+@profile
+
+run the profiler with 
+kernprof -l file_to_profile.py
+
+Print the results with 
+python -m line_profiler file_to_profile.py.lprof 
+
+
+
+virtual environments
+####################
+
+.. code-block:: bash
+
+    python -m venv env
+
+    source env/bin/activate
+
+
+AWS cli
+#######
+
+
+First start a new virtual environment as shown above. 
+
+Then upgrade pip. 
+
+.. code-block:: bash
+
+    pip install --upgrade pip
+
+Install `awscli`
+
+.. code-block:: bash
+
+    pip install --upgrade awscli
+
+Check the aws version
+
+.. code-block:: bash
+
+    aws --version 
+
+Run `aws configure` and enter your credentials
+
+
