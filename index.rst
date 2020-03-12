@@ -23,12 +23,12 @@ Table of Contents
    Docker.rst
    Git.rst
    HttpsSetup.rst
+   MongoDB.rst
+   MySQL.rst
+   Python.rst
    R.rst
    Tmux.rst
-   MongoDB.rst
    Vim.rst
-   Python.rst
-..   MySQL.rst
 ..   PyTorch.rst
 
 Indices and tables
