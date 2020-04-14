@@ -247,7 +247,7 @@ and create a class that implements `InMemoryDbService`.
 
 
 Dictionary
-==========
+##########
 
 **Property**
 A property is a variable inside a component class.
@@ -257,7 +257,7 @@ A method is a function inside a component class.
 
 
 NPM stuff
-=========
+#########
 
 **List all the globally installed packages**
 `npm list -g --depth=0`

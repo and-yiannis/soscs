@@ -19,17 +19,17 @@ Create
 
     CREATE DATABASE <db_name>
 
-Use database
-
-.. code-block:: sql
-
-    USE <db_name>
-
 List databases
 
 .. code-block:: sql
 
     SHOW DATABASES;
+
+Use database
+
+.. code-block:: sql
+
+    USE <db_name>
 
 Delete database
 
@@ -71,6 +71,11 @@ Delete
 
   drop user myuser@localhost;
 
+Change password
+
+.. code-block:: sql
+
+  alter user 'root'@'localhost' identified by 'mypassword';
 
 Grant all privileges to a user on a specific database
 
@@ -82,8 +87,14 @@ Must be logged in as root and have the database <db_name> loaded
 
 
 
-Creating tables
-***************
+Tables
+******
+
+Show all tables
+
+.. code-block:: sql
+
+  show tables;
 
 Create table
 
@@ -96,12 +107,6 @@ Create table
        CONSTRAINT fk_fav_food_person_id FOREIGN KEY (person_id)
        REFERENCES person (person_id)
       );
-
-Show all tables
-
-.. code-block:: sql
-
-  show tables;
 
 Delete table
 

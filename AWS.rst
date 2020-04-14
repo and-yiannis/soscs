@@ -16,7 +16,7 @@ Clone an AWS instance
 
 
 Elastic IP Association / Disassociation
-######################################
+#######################################
 
 * Go to :code:`Elastic IPs`
 * Select the IP address and in the :code:`Actions` menu click :code:`Disassociate`
