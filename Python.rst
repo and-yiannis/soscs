@@ -791,36 +791,24 @@ Start by importing :code:`pyplot`
   import matplotlib.pyplot as plt
 
 
-Create a new figure
+**Creating a new figure**
+
+Two ways a figure can be created are the following: 
 
 .. code-block:: python
 
   fig = plt.figure()
+  ax1 = fig.add_subplot(211)
 
+The figure is created first and a plot is then added onto it. The axes referred to by `ax1` will be the first axes in a 2-by-1 grid.
 
-Add a subplot to the newly created figure. 
-
-.. code-block:: python
-
-  ax1 = fig.add_subplot(1)
-
-
-The two commands can be combined in one as 
+Another way of doing this in one go is 
 
 .. code-block:: python
 
   fig, axes = plt.subplots(2, 2)
 
 will create a new figure with a 2 by 2 grid of subplots. The handles to the subplots are given in axes which is now a list of lists. 
-
-
-Data can be added to subplots as 
-
-.. code-block:: python
-
-  ax1.plot(x, 'k--')
-  ax2.hist(randn(500), bins=50, color='k', alpha=0.5)
-  ax2.clear()
 
 
 Multiple plots can share axes:
@@ -832,17 +820,27 @@ Multiple plots can share axes:
 
 White spaces around multiple plots can be adjusted
 
-
 .. code-block:: python
 
   fig.subplots_adjust(wspace=0, hspace=0)
 
+**Adding Data**
+
+Data can be added to subplots as 
+
+.. code-block:: python
+
+  ax1.plot(x, 'k--')
+  ax2.hist(randn(500), bins=50, color='k', alpha=0.5)
+  ax2.clear()
 
 You can choose a drawstyle
 
 .. code-block:: python
 
   ax1.plot(data 'k-', drawstyle='steps-post')
+
+**Legends**
 
 You can add a label to each line in a plot 
 
@@ -863,13 +861,7 @@ and its location can be set manually using
   ax.legend(loc=(0.8, 0))
   ax.legend(loc='lower right')
 
-Ticks can be added using
-
-.. code-block:: python
-
-  ticks = ax1.set_xticks([0, 250, 500, 750, 1000])
-  labels = ax1.set_xticklabels(['one', 'two', 'three', 'four', 'five'],
-                               rotation=30, fontsize='small')
+**Labels** 
 
 The subplot title can be set as 
 
@@ -884,12 +876,23 @@ The x and y labels
   ax1.set_xlabel('x-label')
   ax1.set_ylabel('y-label')
 
+**Limits**
+
 The limits to the axes can be set as
 
 .. code-block:: python
 
   ax1.set_ylim(-3, 9)
 
+Ticks can be added using
+
+.. code-block:: python
+
+  ticks = ax1.set_xticks([0, 250, 500, 750, 1000])
+  labels = ax1.set_xticklabels(['one', 'two', 'three', 'four', 'five'],
+                               rotation=30, fontsize='small')
+
+**Annotations**
 
 Annotations can be added as 
 
@@ -912,6 +915,8 @@ Shapes can be added to the plot as
   ax1.add_patch(rect)
   ax1.add_patch(circ)
   ax1.add_patch(pgon)
+
+**Batch properties**
 
 Properties can be set in batches using
 
@@ -1012,23 +1017,29 @@ The following sets the background for a plot.
 
 Even though this is set using seaborn, it also applies to regular pyplot and pandas plots. 
 
-#%%
-from bokeh.plotting import figure, output_file, show
 
-x = [1, 2, 3, 4, 5]
-y = [6, 7, 2, 4, 5]
-output_file("lines.html")
-p = figure(title="simple line example", x_axis_label='x', y_axis_label='y')
-p.line(x, y, legend="Temp.", line_width=5)
-show(p)
+Bokeh
+=====
+
+.. code-block:: python
+
+  from bokeh.plotting import figure, output_file, show
+  
+  x = [1, 2, 3, 4, 5]
+  y = [6, 7, 2, 4, 5]
+  output_file("lines.html")
+  p = figure(title="simple line example", x_axis_label='x', y_axis_label='y')
+  p.line(x, y, legend="Temp.", line_width=5)
+  show(p)
 
 
+.. code-block:: python
 
-plt.ion()          interactive on
-plt.title()        prints title
-plt.imshow()       shows images
-plt.colorbar()     shows colorbar
-plt.set_cmap('')   sets the colormap
+  plt.ion()          #interactive on
+  plt.title()        #prints title
+  plt.imshow()       #shows images
+  plt.colorbar()     #shows colorbar
+  plt.set_cmap('')   #sets the colormap
 
 
 
