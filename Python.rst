@@ -1456,23 +1456,44 @@ and a function myfun takes 5 arguments,
 Find the data type of an object
 ###############################
 
-type(a) returns the data type (list, dict, tuple etc)
+:code:`type(a)` returns the data type (list, dict, tuple etc).
 
-a.__class__() returns the class of an object
+:code:`a.__class__()` returns the class of an object.
 
 Difference between is and ==
 ############################
 
-is checks whether two objects are equal 
-== checks whether the values are equal
+:code:`is` checks whether two objects are equal.
 
-a = 1234
-b = 1234
-b is a -> false 
-b == a -> true
+:code:`==` checks whether the values are equal.
 
-HOWEVER! for small integers (e.g. 1) python caches small integer objects (?) and both the above tests would return true!!
-'is' returns true if the operands are represented by the same object in memory. This is not always the case with objects that compare equal with ==
+.. code-block:: python
+
+  a = 1234
+  b = 1234
+  b is a  # false 
+  b == a # true
+
+However, for small integers (e.g. 1) both :code:`is` and :code:`==` can evaluate to :code:`true`. This is because python caches small integer objects and both the above tests would return true!!
+
+In general, :code:`is` returns true if the operands are represented by the same object in memory. This is not always the case with objects that compare equal with :code:`==`
+
+.. code-block:: python
+
+  >>> a = 1
+  >>> b = 1
+  >>> a == b
+  True
+  >>> a is b
+  True
+
+  >>> a = 2000
+  >>> b = 2000
+  >>> a == b
+  True
+  >>> a is b
+  False
+
 
 
 Regular expressions
