@@ -777,282 +777,6 @@ Chapter 5
                  skip_footer=38, parse_cols=[2,3,4,5], na_values='...')
  
 
-Plotting
-********
-
-Pyplot
-======
-
-
-Start by importing :code:`pyplot`
-
-.. code-block:: python
-
-  import matplotlib.pyplot as plt
-
-
-**Creating a new figure**
-
-Two ways a figure can be created are the following: 
-
-.. code-block:: python
-
-  fig = plt.figure()
-  ax1 = fig.add_subplot(211)
-
-The figure is created first and a plot is then added onto it. The axes referred to by `ax1` will be the first axes in a 2-by-1 grid.
-
-Another way of doing this in one go is 
-
-.. code-block:: python
-
-  fig, axes = plt.subplots(2, 2)
-
-will create a new figure with a 2 by 2 grid of subplots. The handles to the subplots are given in axes which is now a list of lists. 
-
-
-Multiple plots can share axes:
-
-.. code-block:: python
-
-  fig, axes = plt.subplots(2, 2, sharex=True, sharey=True)
-
-
-White spaces around multiple plots can be adjusted
-
-.. code-block:: python
-
-  fig.subplots_adjust(wspace=0, hspace=0)
-
-**Adding Data**
-
-Data can be added to subplots as 
-
-.. code-block:: python
-
-  ax1.plot(x, 'k--')
-  ax2.hist(randn(500), bins=50, color='k', alpha=0.5)
-  ax2.clear()
-
-You can choose a drawstyle
-
-.. code-block:: python
-
-  ax1.plot(data 'k-', drawstyle='steps-post')
-
-**Legends**
-
-You can add a label to each line in a plot 
-
-.. code-block:: python
-
-  ax1.plot(data.cumsum(), 'k--', label='Default')
-
-and then show the legend
-
-.. code-block:: python
-
-  ax1.legend(loc='best')
-
-and its location can be set manually using
-
-.. code-block:: python
-
-  ax.legend(loc=(0.8, 0))
-  ax.legend(loc='lower right')
-
-**Labels** 
-
-The subplot title can be set as 
-
-.. code-block:: python
-
-  ax1.set_title('My first matplotlib plot')
-
-The x and y labels 
-
-.. code-block:: python
-
-  ax1.set_xlabel('x-label')
-  ax1.set_ylabel('y-label')
-
-**Limits**
-
-The limits to the axes can be set as
-
-.. code-block:: python
-
-  ax1.set_ylim(-3, 9)
-
-Ticks can be added using
-
-.. code-block:: python
-
-  ticks = ax1.set_xticks([0, 250, 500, 750, 1000])
-  labels = ax1.set_xticklabels(['one', 'two', 'three', 'four', 'five'],
-                               rotation=30, fontsize='small')
-
-**Annotations**
-
-Annotations can be added as 
-
-.. code-block:: python
-
-  ax1.annotate(label, xy=(<location_of_point_to_annotate>),
-               xytext=(<location_of_text>),
-               arrowprops=dict(facecolor='black'),
-               horizontalalignment='center', verticalalignment='top')
-    
-
-Shapes can be added to the plot as
-
-.. code-block:: python
-
-  rect = plt.Rectangle((0.25, 0.35), 0.5, 0.25, color='k', alpha=0.3)    
-  circ = plt.Circle((0.7, 0.6), 0.15, color='b', alpha=0.3)
-  pgon = plt.Polygon([[0.15, 0.15], [0.35, 0.4], [0.2, 0.6]],
-                     color='g', alpha=0.5)
-  ax1.add_patch(rect)
-  ax1.add_patch(circ)
-  ax1.add_patch(pgon)
-
-**Batch properties**
-
-Properties can be set in batches using
-
-.. code-block:: python
-
-  props = {
-    'title': 'My first matplotlib plot',
-    'xlabel': 'Stages'
-  }
-  ax.set(**props)
-
-
-Pandas
-======
-
-Series
-
-.. code-block:: python
-
-  s = pd.Series(...)
-  s.plot()
-
-Dataframes 
-
-.. code-block:: python
-
-  df = pdDataFrame(...)
-  df.plot()
-
-You can place a plot in a specific subplot
-
-.. code-block:: python
-
-  fig, ax = plt.subplots(1)
-  s.plot(ax=ax)
-
-Different plot types
-
-.. code-block:: python
-
-  s.plot() # regular plot
-  s.plot.bar() # bars
-  s.plot.hist() # histogram
-
-  s.plot(kind='bar', ax=axes[0], color='k', alpha=0.7)
-  s.plot(kind='barh', ax=axes[1], color='k', alpha=0.7)
-
-  df.plot(kind='barh', stacked=True, alpha=0.5)
-
-
-Seaborn
-=======
-
-Import seaborn
-
-.. code-block:: python
-
-  import seaborn as sns
-
-Barplots
-
-.. code-block:: python
-
-  sns.barplot(x= ,y= , data= , orient= )
-
-Distribution plots (plots an estimage of the pdf and a histogram). 
-
-.. code-block:: python
-
-  sns.distplot(values, bins=100, color='k')
-
-Regression scatter plots
-
-.. code-block:: python
-
-  sns.regplot('m1', 'unemp', data=trans_data)
-
-Pair plots
-
-.. code-block:: python
-
-  sns.pairplot(trans_data, diag_kind='kde', plot_kws={'alpha': 0.2})
-
-Categorical plots
-
-.. code-block:: python
-
-  sns.catplot(x='day', y='tip_pct', hue='time', col='smoker',
-               kind='bar', data=tips[tips.tip_pct < 1])
-
-
-The following sets the background for a plot.
-
-.. code-block:: python
-
-  sns.set(style={"darkgrid", "whitegrid", "dark"
-                 "white", "ticks"})
-
-Even though this is set using seaborn, it also applies to regular pyplot and pandas plots. 
-
-
-Bokeh
-=====
-
-.. code-block:: python
-
-  from bokeh.plotting import figure, output_file, show
-  
-  x = [1, 2, 3, 4, 5]
-  y = [6, 7, 2, 4, 5]
-  output_file("lines.html")
-  p = figure(title="simple line example", x_axis_label='x', y_axis_label='y')
-  p.line(x, y, legend="Temp.", line_width=5)
-  show(p)
-
-
-.. code-block:: python
-
-  plt.ion()          #interactive on
-  plt.title()        #prints title
-  plt.imshow()       #shows images
-  plt.colorbar()     #shows colorbar
-  plt.set_cmap('')   #sets the colormap
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 Chapter 7
 *********
@@ -1191,6 +915,384 @@ Max number of rows
     pd.options.display.max_rows = 999
 Float formatting
     pd.options.display.float_format = '{:,.2f}'.format
+
+
+
+Plotting
+########
+
+Pyplot
+******
+
+
+Start by importing :code:`pyplot`
+
+.. code-block:: python
+
+  import matplotlib.pyplot as plt
+
+
+Creating a new figure
+=====================
+
+One way of creating a figure is the following: 
+
+.. code-block:: python
+
+  fig = plt.figure()
+  ax1 = fig.add_subplot(211)
+
+The figure is created first and a plot is then added onto it. The axes referred to by :code:`ax1` will be the first axes in a 2-by-1 grid.
+
+Another way of doing this in one go is 
+
+.. code-block:: python
+
+  fig, axes = plt.subplots(2, 2)
+
+will create a new figure with a 2 by 2 grid of subplots. The handles to the subplots are given in axes which is now a list of lists. 
+
+
+Multiple plots can share axes:
+
+.. code-block:: python
+
+  fig, axes = plt.subplots(2, 2, sharex=True, sharey=True)
+
+
+White spaces around multiple plots can be adjusted
+
+.. code-block:: python
+
+  fig.subplots_adjust(wspace=0, hspace=0)
+
+Adding Data
+===========
+
+Data can be added to subplots as 
+
+.. code-block:: python
+
+  ax1.plot(x, 'k--')
+  ax2.hist(randn(500), bins=50, color='k', alpha=0.5)
+  ax2.clear()
+
+Some of the most common options are:
+
+.. code-block:: python
+
+  alpha: float # transparency
+  color or c: # color
+  drawstyle or ds: {'default', 'steps', 'steps-pre', 'steps-mid', 'steps-post'}, default: 'default'
+  fillstyle: {'full', 'left', 'right', 'bottom', 'top', 'none'}
+  label: object # Label for the legend
+  linestyle or ls: {'-', '--', '-.', ':', '', (offset, on-off-seq), ...}
+  linewidth or lw: float
+  marker: marker style
+  markeredgecolor or mec: color
+  markeredgewidth or mew: float
+  markerfacecolor or mfc: color
+  markerfacecoloralt or mfcalt: color
+  markersize or ms: float
+  zorder: float # Order compared to the rest elements of the plot
+
+Legends
+=======
+
+You can add a label to each line in a plot 
+
+.. code-block:: python
+
+  ax1.plot(data.cumsum(), 'k--', label='Default')
+
+and then show the legend
+
+.. code-block:: python
+
+  ax1.legend(loc='best')
+
+and its location can be set manually using
+
+.. code-block:: python
+
+  ax.legend(loc=(0.8, 0))
+  ax.legend(loc='lower right')
+
+
+Labels
+======
+
+The subplot title can be set as 
+
+.. code-block:: python
+
+  ax1.set_title('My first matplotlib plot')
+
+The x and y labels 
+
+.. code-block:: python
+
+  ax1.set_xlabel('x-label')
+  ax1.set_ylabel('y-label')
+
+Limits and Ticks
+================
+
+The limits to the axes can be set as
+
+.. code-block:: python
+
+  ax1.set_ylim(-3, 9)
+  ax1.set_xlim(0, 100)
+
+Ticks can be added using
+
+.. code-block:: python
+
+  ticks = ax1.set_xticks([0, 250, 500, 750, 1000])
+  labels = ax1.set_xticklabels(['one', 'two', 'three', 'four', 'five'],
+                               rotation=30, fontsize='small')
+
+
+
+**Locators and Formatters**
+
+This code sets ticks along the :code:`y` axis at multiples of 1 and formats it as a float with 1 decimal point.
+
+.. code-block:: python
+
+   from matplotlib import ticker
+   ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
+   ax.yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.1f}"))
+
+:code:`xaxis` works correspondingly for the :code:`axis` and :code:`minor` for the minor instead of major ticks.
+
+
+**Ticking on Dates**
+
+The following tools make ticks along axes that contain dates easy to work with
+
+
+.. code-block:: python
+
+   from matplotlib import dates
+   ax.xaxis.set_major_locator(dates.MonthLocator(bymonthday=[1, 15]))
+   ax.xaxis.set_major_formatter(dates.DateFormatter('%b-%d'))
+
+
+:code:`MonthLocator` ticks on specific dates in a month, while the library also offers from a :code:`MinuteLocator` to a :code:`YearLocator`.
+
+The :code:`DateFormatter` uses the `strftime() <https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behaviorformats>`_ formatting conventions.
+
+
+**Tick location**
+
+The Tick's location can be modified using
+
+.. code-block:: python
+
+   ax.yaxis.tick_right()
+   ax.yaxis.tick_left()
+   ax.xaxis.tick_top()
+   ax.xaxis.tick_bottom()
+
+
+Grids
+=====
+
+The grid can be set using
+
+
+.. code-block:: python
+
+  ax.grid(which='major', axis='y', c='k', alpha=.1, zorder=-2)
+
+
+Additionally, the lines along the axes can be removed using
+
+.. code-block:: python
+
+   ax.spines['left'].set_visible(False)
+   ax.spines['bottom'].set_visible(False)
+   ax.spines['right'].set_visible(False)
+
+
+Annotations
+===========
+
+Annotations can be added as 
+
+.. code-block:: python
+
+  ax1.annotate(label, xy=(<location_of_point_to_annotate>),
+               xytext=(<location_of_text>),
+               arrowprops=dict(facecolor='black'),
+               horizontalalignment='center', verticalalignment='top')
+    
+
+Shapes can be added to the plot as
+
+.. code-block:: python
+
+  rect = plt.Rectangle((0.25, 0.35), 0.5, 0.25, color='k', alpha=0.3)    
+  circ = plt.Circle((0.7, 0.6), 0.15, color='b', alpha=0.3)
+  pgon = plt.Polygon([[0.15, 0.15], [0.35, 0.4], [0.2, 0.6]],
+                     color='g', alpha=0.5)
+  ax1.add_patch(rect)
+  ax1.add_patch(circ)
+  ax1.add_patch(pgon)
+
+Batch properties
+================
+
+Properties can be set in batches using
+
+.. code-block:: python
+
+  props = {
+    'title': 'My first matplotlib plot',
+    'xlabel': 'Stages'
+  }
+  ax.set(**props)
+
+
+Visualising matrices
+====================
+
+Suppose that you have a matrix :code:`P` that is :code:`1200 x 54`. Its first row corresponds to the value :code:`0` and the last to the value :code:`12`. Its first column corresponds to value :code:`0` and the last to value :code:`53`. To visualise this matrix use the following
+
+
+.. code-block:: python
+
+   fig, ax = plt.subplots()
+   pcm = ax.imshow(p, aspect='auto', origin='lower', extent=[0, 53, 0, 12])
+   fig.colorbar(pcm, ax=ax)
+
+
+* :code:`aspect` makes sure that the pixels do not have a ratio of 1. Useful for visualising thin matrices
+* :code:`origin` places the top left corner of the matrix to the lower left corner of the plot
+* :code:`extent` sets the values displayed along the :code:`x` (:code:`0, 53`)and the :code:`y` axes (:code:`0, 12`).
+
+
+
+
+Pandas
+******
+
+Series
+
+.. code-block:: python
+
+  s = pd.Series(...)
+  s.plot()
+
+Dataframes 
+
+.. code-block:: python
+
+  df = pdDataFrame(...)
+  df.plot()
+
+You can place a plot in a specific subplot
+
+.. code-block:: python
+
+  fig, ax = plt.subplots(1)
+  s.plot(ax=ax)
+
+Different plot types
+
+.. code-block:: python
+
+  s.plot() # regular plot
+  s.plot.bar() # bars
+  s.plot.hist() # histogram
+
+  s.plot(kind='bar', ax=axes[0], color='k', alpha=0.7)
+  s.plot(kind='barh', ax=axes[1], color='k', alpha=0.7)
+
+  df.plot(kind='barh', stacked=True, alpha=0.5)
+
+
+Seaborn
+*******
+
+Import seaborn
+
+.. code-block:: python
+
+  import seaborn as sns
+
+Barplots
+
+.. code-block:: python
+
+  sns.barplot(x= ,y= , data= , orient= )
+
+Distribution plots (plots an estimage of the pdf and a histogram). 
+
+.. code-block:: python
+
+  sns.distplot(values, bins=100, color='k')
+
+Regression scatter plots
+
+.. code-block:: python
+
+  sns.regplot('m1', 'unemp', data=trans_data)
+
+Pair plots
+
+.. code-block:: python
+
+  sns.pairplot(trans_data, diag_kind='kde', plot_kws={'alpha': 0.2})
+
+Categorical plots
+
+.. code-block:: python
+
+  sns.catplot(x='day', y='tip_pct', hue='time', col='smoker',
+               kind='bar', data=tips[tips.tip_pct < 1])
+
+
+The following sets the background for a plot.
+
+.. code-block:: python
+
+  sns.set(style={"darkgrid", "whitegrid", "dark"
+                 "white", "ticks"})
+
+Even though this is set using seaborn, it also applies to regular pyplot and pandas plots. 
+
+
+Bokeh
+*****
+
+.. code-block:: python
+
+  from bokeh.plotting import figure, output_file, show
+  
+  x = [1, 2, 3, 4, 5]
+  y = [6, 7, 2, 4, 5]
+  output_file("lines.html")
+  p = figure(title="simple line example", x_axis_label='x', y_axis_label='y')
+  p.line(x, y, legend="Temp.", line_width=5)
+  show(p)
+
+
+.. code-block:: python
+
+  plt.ion()          #interactive on
+  plt.title()        #prints title
+  plt.imshow()       #shows images
+  plt.colorbar()     #shows colorbar
+  plt.set_cmap('')   #sets the colormap
+
+
+
+
+
+
 
 Decorators
 ##########
