@@ -41,13 +41,15 @@ Dump database
 
 .. code-block:: bash
 
-  mysqldump <db_name> > backup-file.sql
+  mysqldump -p -u <username> <db_name> > backup-file.sql
 
 Load from dump
 
 .. code-block:: bash
 
   mysql <db_name> < backup-file.sql
+
+When importing from a dump file, make sure that it does not contain a :code:`USE <database>` statement at the beginning. If it does, it might not update the database that is described in the mysql command above, but the one provided in the USE statement.
     
 
 Users
