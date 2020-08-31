@@ -916,6 +916,101 @@ Max number of rows
 Float formatting
     pd.options.display.float_format = '{:,.2f}'.format
 
+Dates
+*****
+
+Creating date ranges
+====================
+
+.. code-block:: python
+
+  pd.date_range('start-date', 'end-date', periods, freq)
+
+
+Timestamps
+==========
+
+Time stamps is the most basic type of time series data that associates values with points in time. 
+
+.. code-block:: python
+
+   pd.Timestamp('2012-05-01')
+
+Periods
+=======
+
+A period represents a span rather than a point in time
+
+Time stamps is the most basic type of time series data that associates values with points in time. 
+
+.. code-block:: python
+
+   pd.Period('2011-01', 'M')
+
+Time offsets
+============
+
+.. code-block:: python
+
+   pd.Timedelta('1 day')
+
+
+Rolling windows
+===============
+
+The code below, calculates the mean using a rectangular window of 60 points and plots the result...
+
+.. code-block:: python
+
+ df.rolling(window = 60).mean().plot()
+
+
+Autocorrelation
+===============
+
+.. code-block:: python
+
+ from statsmodels.tsa.stattols import acf
+
+This calculates the autocorrelation at time t as
+
+.. code-block:: python
+
+  np.sum((x[:-t] - np.mean(x)) * (x[t:] - np.mean(x))) / np.sum((x - np.mean(x))**2)
+
+Augmented Dickey Fuller test
+============================
+
+This tests the null hypothesis that the unit root is present in a time series sample. If the unit root is present then the sample is non-stationary. The null hypothesis therefore is that the signal is non-stationary. If the p value is sufficiently small then we can reject the hypothesis that the signal is non-stationary. 
+
+.. code-block:: python
+
+  from statsmodels.tsa.stattools import adfuller
+
+Shift
+=====
+
+The shift method shifts the index by a desired number of periods
+
+.. code-block:: python
+
+  pd.Series.shift
+
+Seasonal decomposition
+======================
+
+The following decomposes the signal into a trend, a seasonal component and a residual
+
+.. code-block:: python
+
+  from statsmodels.tsa.seasonal import seasonal_decompose
+
+
+
+
+
+
+
 
 
 Plotting

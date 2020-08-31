@@ -90,37 +90,54 @@ Containers can be managed either with the :code:`docker` or the :code:`docker co
 
 * :code:`docker container ls`
 
-  * List all running containers
+   List all running containers
 
 * :code:`docker container ls -aq` 
 
-  * List all containers, showing only the hashes
+   List all containers, showing only the hashes
 
 * :code:`docker create <docker_name>`
 
-  * Create a new container (syntax similar to docker run).
+   Create a new container (syntax similar to docker run).
 
 * :code:`docker start <docker_id>`
 
-  * Restart a non-running container 
+   Restart a non-running container 
 
 * :code:`docker stop <docker_id>`
 
-  * Gracefully stop container
+   Gracefully stop container
 
 * :code:`docker kill <docker_id>`
 
-  * Forcefully stop container
+   Forcefully stop container
 
 * :code:`docker rm <docker_id>`
 
-  * Remove specified container
+   Remove specified container
+
+
+:code:`<docker_id>` can either be the container's name or its hash tag. 
+
 
 * :code:`docker rm $(docker container ls -a -q)`
 
-  * Remove all containers
+   Remove all containers  
 
-:code:`<docker_id>` can either be the container's name or its hash tag. 
+
+* :code:`docker system prune -a`
+
+   WARNING! This will remove:
+
+     * all stopped containers
+
+     * all networks not used by at least one container
+
+     * all images without at least one container associated to them
+
+     * all build cache
+
+
 
 
 
@@ -269,12 +286,71 @@ One way of updating a container using latest code is to rebuild the image, and r
   docker-compose up
 
 
+Docker registry
+*******************************
+
+**Get an image's digest:**
+
+.. code-block:: bash
+
+  curl -v -X GET <registry.ip.address>:<port>/v2/<image_name>/manifests/<image_tag> 2>&1 |grep Docker-Content-Digest | awk '{print($3)}'
+
+this is useful for uniquely identifying an image for e.g. deleting it.
 
 
 
 
+Docker installation on Centos 8
+*******************************
 
 
+Below are instructions for adding Docker and Docker Compose on Centos 8.
+
+**Docker installation**
+
+Enable Docker CE Repository
+
+.. code-block:: bash
+
+  dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
+
+Install docker using the DNF command
+
+.. code-block:: bash
+
+  dnf install docker-ce --nobest -y
+  systemctl start docker
+  systemctl enable docker
+
+Verify and test the Docker CE Engine
+
+.. code-block:: bash
+
+  docker --version
+  docker run hello-world
+
+To run docker without root permissions for user 'user_name' 
+
+.. code-block:: bash
+
+  groupadd docker
+  usermod -aG docker user_name
+
+**docker-compose installation**
+
+.. code-block:: bash
+
+  dnf install curl -y
+  curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  sudo chmod +x /usr/local/bin/docker-compose
+  docker-compose --version
+
+
+It's worth checking the latest docker compose release in https://github.com/docker/compose/releases.
+
+
+Instructions taken from 
+https://www.linuxtechi.com/install-docker-ce-centos-8-rhel-8/
 
 
 

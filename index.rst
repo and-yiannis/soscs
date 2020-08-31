@@ -25,6 +25,8 @@ Table of Contents
    HttpsSetup.rst
    MongoDB.rst
    MySQL.rst
+   ML.rst
+   Nest.rst
    Python.rst
    R.rst
    Tmux.rst
