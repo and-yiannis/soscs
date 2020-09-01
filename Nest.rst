@@ -361,6 +361,49 @@ Request objects
 |:code:`@Ip()`                      |    :code:`req.ip`                          |
 +-----------------------------------+--------------------------------------------+
 
+Example
+*******
+
+An example of a basic CRUD controller is given below
+
+.. code-block:: typescript
+
+    import { Controller, Get, Param, Delete, Post, Body } from '@nestjs/common';
+    
+    import { User } from './user.entity';
+    import { UserService } from './user.service';
+    import { CreateUserDto } from './dto/create-user.dto';
+    
+    @Controller('user')
+    export class UserController {
+        constructor(
+            private readonly userService: UserService
+        ) {}
+    
+        @Get()
+        findAll(): Promise<User[]> {
+            return this.userService.findAll();
+        }
+    
+        @Get(':id')
+        findOne(@Param('id') id): Promise<User> {
+            return this.userService.findOne(id);
+        }
+    
+        @Post()
+        createUser(@Body(), createUserDto: CreateUserDto): Promise<User> {
+            return this.userService.create(createUserDto)
+        }
+    
+        @Delete(':id')
+        remove(@Param('id') id): Promise<void> {
+            return this.userService.remove(id);
+        }
+    
+    }
+
+
+
 
 
 Services
@@ -378,10 +421,79 @@ exist, and the file :code:`<service_name>.service.ts` in it.
 It will also add the service's name to the :code:`providers` section
 of the respective module. 
 
+An example of a service that implements a basic REST functionality is shown below. A similar example can be found in nestjs' github, :code:`sample/05-sql-typeorm`.
+
+.. code-block:: typescript
+
+    import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+    import { InjectRepository } from '@nestjs/typeorm';
+    import { Repository } from 'typeorm';
+
+    import { User } from './user.entity';
+    import { CreateUserDto } from './dto/create-user.dto';
+    
+    @Injectable()
+    export class UserService {
+      constructor(
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>,
+      ){}
+    
+      create(createUserDto: CreateUserDto): Promise<User> {
+        const user = new User();
+    
+        if (!createUserDto.name) { 
+          throw new HttpException(
+            "Body should contain a 'name' field",
+            HttpStatus.BAD_REQUEST
+          );
+        }
+        user.name = createUserDto.user;
+        return this.userRepository.save(user);
+      }
+    
+      async findAll(): Promise<User[]> {
+        return this.userRepository.find();
+      }
+    
+      findOne(id: string): Promise<User> {
+        return this.userRepository.findOne(id);
+      }
+    
+      async remove(id: string): Promise<void> {
+        const user = await this.userRepository.findOne(id);
+        if (!user) {
+            throw new HttpException(
+                "Not found",
+                HttpStatus.NOT_FOUND
+            )
+        }
+
+        await this.userRepository.delete(id);
+      }
+    }
+
+
 Scoping
 *******
 
 Services are scoped to a module. They are not available to other modules. Unlike Angular where they are available everywhere. 
+
+DTOs
+####
+
+Data Transfer Objects (DTOs) define how the data will be sent of the the network. DTOs can be stored in a :code:`dto` folder inside the relevant module.
+
+.. code-block:: typescript
+   :caption: dto/create-cat.dto.ts
+
+    export class CreateCatDto {
+      name: string;
+      age: number;
+      breed: string;
+    }
+
+
 
 
 Swagger support
@@ -427,6 +539,66 @@ Then add in main.ts
    }
    bootstrap();
 
+Parameter support in swagger can be added by modifying the controller as follows:
+
+.. code-block:: typescript
+    :emphasize-lines: 3,13
+
+    import { Controller, Get, Param, Delete } from '@nestjs/common';
+    ...
+    import { ApiParam } from '@nestjs/swagger';
+
+    @Controller('book')
+    export class BookController {
+        constructor(
+            private readonly bookService: BookService
+        ){}
+        ... 
+        @ApiParam({type: "string", name: 'id'})
+        @Get(':id')
+        findOne(@Param('id') id) {
+            return this.bookService.findOne(id);
+        }
+        ...
+        }
+    }
+
+To see the expected fields of a request body, decorate the respective DTO with the 
+:code:`@ApiProperty()`.
+
+.. code-block:: typescript
+    :emphasize-lines: 1,4,7
+    :caption: create-book.dto.ts
+
+    import { ApiProperty } from '@nestjs/swagger';
+    
+    export class CreateBookDto {
+        @ApiProperty()
+        title: string;
+    
+        @ApiProperty()
+        year: number;
+    }
+
+Authentication in swagger can be enabled via :code:`@ApiBearerAuth()`
+
+.. code-block:: typescript
+    :emphasize-lines: 3,5
+
+    import { Controller, Get, Param, Delete } from '@nestjs/common';
+    ...
+    import { ApiBearerAuth } from '@nestjs/swagger';
+
+    @ApiBearerAuth()
+    @Controller('book')
+    export class BookController {
+        constructor(
+            private readonly bookService: BookService
+        ){}
+        ... 
+    }
+
+
 Type ORM
 ########
 
@@ -441,6 +613,7 @@ Initialise
 **********
 
 .. code-block:: typescript
+   :caption: app.module.ts
 
    import { Module } from '@nestjs/common';
    import { TypeOrmModule } from '@nestjs/typeorm';
@@ -468,6 +641,7 @@ Entities
 ********
 
 .. code-block:: typescript
+   :caption: user.entity.ts
 
     import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
     
@@ -493,50 +667,52 @@ Each module should import the entities defined in current scope using the
 :code:`forFeature()` method.
 
 .. code-block:: typescript
-    :emphasize-lines: 5,8
+   :caption: user.module.ts
+   :emphasize-lines: 5,8
 
-    import { Module } from '@nestjs/common';
-    import { TypeOrmModule } from '@nestjs/typeorm';
-    import { UsersService } from './users.service';
-    import { UsersController } from './users.controller';
-    import { User } from './user.entity';
-    
-    @Module({
-      imports: [TypeOrmModule.forFeature([User])],
-      providers: [UsersService],
-      controllers: [UsersController],
-    })
-    export class UsersModule {}
+   import { Module } from '@nestjs/common';
+   import { TypeOrmModule } from '@nestjs/typeorm';
+   import { UserService } from './user.service';
+   import { UserController } from './user.controller';
+   import { User } from './user.entity';
+   
+   @Module({
+     imports: [TypeOrmModule.forFeature([User])],
+     providers: [UserService],
+     controllers: [UserController],
+   })
+   export class UserModule {}
 
 The repository can then be injected in the service...
 
 .. code-block:: typescript
-    :emphasize-lines: 2,3,4,9,10,14,18,22
+   :caption: user.service.ts
+   :emphasize-lines: 2,3,4,9,10,14,18,22
 
-    import { Injectable } from '@nestjs/common';
-    import { InjectRepository } from '@nestjs/typeorm';
-    import { Repository } from 'typeorm';
-    import { User } from './user.entity';
-    
-    @Injectable()
-    export class UsersService {
-      constructor(
-        @InjectRepository(User)
-        private usersRepository: Repository<User>,
-      ) {}
-    
-      findAll(): Promise<User[]> {
-        return this.usersRepository.find();
-      }
-    
-      findOne(id: string): Promise<User> {
-        return this.usersRepository.findOne(id);
-      }
-    
-      async remove(id: string): Promise<void> {
-        await this.usersRepository.delete(id);
-      }
-    }
+   import { Injectable } from '@nestjs/common';
+   import { InjectRepository } from '@nestjs/typeorm';
+   import { Repository } from 'typeorm';
+   import { User } from './user.entity';
+   
+   @Injectable()
+   export class UserService {
+     constructor(
+       @InjectRepository(User)
+       private userRepository: Repository<User>,
+     ) {}
+   
+     findAll(): Promise<User[]> {
+       return this.userRepository.find();
+     }
+   
+     findOne(id: string): Promise<User> {
+       return this.userRepository.findOne(id);
+     }
+   
+     async remove(id: string): Promise<void> {
+       await this.userRepository.delete(id);
+     }
+   }
 
 If you want to use the repository outside of the module which imports
 :code:`TypeOrmModule.forFeature`, you'll need to re-export the providers
@@ -553,7 +729,7 @@ generated by it. You can do this by exporting the whole module, like this:
       imports: [TypeOrmModule.forFeature([User])],
       exports: [TypeOrmModule]
     })
-    export class UsersModule {}
+    export class UserModule {}
 
 
 Auto-load entities
@@ -562,6 +738,55 @@ Manually adding entities to the entities array of the connection options can be
 tedious. To address this issue, an alternative solution is provided. To
 automatically load entities, set the :code:`autoLoadEntities` property
 of the configuration object (passed into the :code:`forRoot()` method) to true.
+
+Nestjsx Crud
+************
+
+A basic set of CRUD services can be automatically generated with nestjsx crud:
+
+https://github.com/nestjsx/crud
+
+The service
+
+.. code-block:: typescript
+    :emphasize-lines: 3,8,9,10
+
+    import { Injectable } from "@nestjs/common";
+    import { InjectRepository } from "@nestjs/typeorm";
+    import { TypeOrmCrudService } from "@nestjsx/crud-typeorm";
+    
+    import { Company } from "./company.entity";
+    
+    @Injectable()
+    export class CompaniesService extends TypeOrmCrudService<Company> {
+      constructor(@InjectRepository(Company) repo) {
+        super(repo);
+      }
+    }
+
+The controller
+
+.. code-block:: typescript
+    :emphasize-lines: 2,7,8,9,10,11,13
+
+    import { Controller } from "@nestjs/common";
+    import { Crud, CrudController } from "@nestjsx/crud";
+    
+    import { Company } from "./company.entity";
+    import { CompaniesService } from "./companies.service";
+    
+    @Crud({
+      model: {
+        type: Company,
+      },
+    })
+    @Controller("companies")
+    export class CompaniesController implements CrudController<Company> {
+      constructor(public service: CompaniesService) {}
+    }
+
+
+
 
 Relations
 *********
@@ -771,50 +996,42 @@ of the intermediate entity, that contains two many to one relations pointing
 to both *category* and *question*.
 
 
+Steps
+#####
 
-Nestjsx Crud
-************
+Follow the steps below to create a basic CRUD back end.
 
-https://github.com/nestjsx/crud
+* Create the module
 
-The service
+    * :code:`nest generate module <name>`
+    * adds an entry in the imports section of the app.module.ts
 
-.. code-block:: typescript
-    :emphasize-lines: 3,8,9,10
+* Create the <name>.entity.ts
 
-    import { Injectable } from "@nestjs/common";
-    import { InjectRepository } from "@nestjs/typeorm";
-    import { TypeOrmCrudService } from "@nestjsx/crud-typeorm";
-    
-    import { Company } from "./company.entity";
-    
-    @Injectable()
-    export class CompaniesService extends TypeOrmCrudService<Company> {
-      constructor(@InjectRepository(Company) repo) {
-        super(repo);
-      }
-    }
+* Create any DTOs in the :code:`./dto` folder.
 
-The controller
+    * Decorate with the :code:`@ApiProperty()` for swagger support.
 
-.. code-block:: typescript
-    :emphasize-lines: 2,7,8,9,10,11,13
+* Create the service
 
-    import { Controller } from "@nestjs/common";
-    import { Crud, CrudController } from "@nestjsx/crud";
-    
-    import { Company } from "./company.entity";
-    import { CompaniesService } from "./companies.service";
-    
-    @Crud({
-      model: {
-        type: Company,
-      },
-    })
-    @Controller("companies")
-    export class CompaniesController implements CrudController<Company> {
-      constructor(public service: CompaniesService) {}
-    }
+    * :code:`nest generate service <name>`
+    * Register the service in the :code:`providers` section of the module
+    * Follow the template in the Services section.
+
+* Create the Controller
+
+    * :code:`nest generate controller <name>`
+    * Register the service in the :code:`controllers` section of the module
+    * Follow the template in the Controllers section.
+    * Add swagger support with :code:`@ApiParam()`
+
+* Add the repository in the Module's imports
+
+    * :code:`[TypeOrmModule.forFeature([<name>])]`
+
+* Add the repository in the top level module's entities
+
+    * :code:`TypeOrmModule.forRoot({ ..., entities[<name>], ...})
 
 
 

@@ -102,19 +102,81 @@ Create table
 
 .. code-block:: sql
 
-  CREATE TABLE favorite_food
-      (person_id SMALLINT UNSIGNED,
-       food VARCHAR(20),
-       CONSTRAINT pk_favorite_food PRIMARY KEY (person_id, food),
-       CONSTRAINT fk_fav_food_person_id FOREIGN KEY (person_id)
-       REFERENCES person (person_id)
+   -- Create a table user in schema blog, with primary key 'id'
+   CREATE TABLE `blog`.`user` (
+      `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `firstname` VARCHAR(255) ,
+      `lastname` VARCHAR(255) NOT NULL,
+      PRIMARY KEY (`id`)
       );
+
+   -- Create a table post with a foreign key 'user_id' referencing `user`.`id`
+   CREATE TABLE `blog`.`post` (
+      `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `text` VARCHAR(255),
+      `user_id` INT UNSIGNED,
+      CONSTRAINT pk_id PRIMARY KEY (`id`),
+      CONSTRAINT fk_user_id FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+      );
+
+
+
+Describe table
+
+.. code-block:: sql
+
+    DESCRIBE food;
+
+Alter table
+
+.. code-block:: sql
+
+  ALTER TABLE t2 DROP COLUMN c, DROP COLUMN d;
+
 
 Delete table
 
 .. code-block:: sql
 
   drop table favorite_food; 
+
+Data types
+
++------------+-------------------------------+-----------+-------------------------------------------------------+
+|CHAR        | String (0-255)                | INT       | Integer (-2147483648 to 2147483647)                   |
++------------+-------------------------------+-----------+-------------------------------------------------------+
+|VARCHAR     | String (0-255)                | BIGINT    | Integer (-9223372036854775808 to 9223372036854775807) |
++------------+-------------------------------+-----------+-------------------------------------------------------+
+|TINYTEXT    | String (0-255)                | FLOAT     | Decimal (precise to 23 digits)                        |
++------------+-------------------------------+-----------+-------------------------------------------------------+
+|TEXT        | String (0-65535)              | DOUBLE    | Decimal (24 to 53 digits)                             |
++------------+-------------------------------+-----------+-------------------------------------------------------+
+|BLOB        | String (0-65535)              | DECIMAL   | "DOUBLE" stored as string                             |
++------------+-------------------------------+-----------+-------------------------------------------------------+
+|MEDIUMTEXT  | String (0-16777215)           | DATE      | YYYY-MM-DD                                            |
++------------+-------------------------------+-----------+-------------------------------------------------------+
+|MEDIUMBLOB  | String (0-16777215)           | DATETIME  | YYYY-MM-DD HH:MM:SS                                   |
++------------+-------------------------------+-----------+-------------------------------------------------------+
+|LONGTEXT    | String (0-4294967295)         | TIMESTAMP | YYYMMDDHHMMSS                                         |
++------------+-------------------------------+-----------+-------------------------------------------------------+
+|LONGBLOB    | String (0-4294967295)         | TIME      | HH:MM:SS                                              |
++------------+-------------------------------+-----------+-------------------------------------------------------+
+|TINYINT     | Integer (-128 to 127)         | ENUM      | One of preset options                                 |
++------------+-------------------------------+-----------+-------------------------------------------------------+
+|SMALLINT    | Integer (-23768 to 32767)     | SET       | Selection of preset options                           |
++------------+-------------------------------+-----------+-------------------------------------------------------+
+|MEDIUMINT   | Integer (-8388608 to 8388607) | BOOLEAN   | TINYINT(1)                                            |
++------------+-------------------------------+-----------+-------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
 
 
 
