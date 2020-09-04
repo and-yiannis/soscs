@@ -130,22 +130,25 @@ A classifier that always says it's not there (:math:`\hat{y}=0`), will have TPR=
 
 
 
-To remember
-###########
+XGBoost
+#######
 
-
+Data Preparation
+****************
 
 .. code-block:: python
 
-   from sklearn.metrics import mean_squared_error
-   from sklearn.model_selection import train_test_split
-
-XGBoost
-#######
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, Y, test_size=test_size, random_state=seed
+    )
+    dtrain = xgb.DMatrix(X_train, label=y_train)
+    dtest = xgb.DMatrix(X_test, label=y_test)
 
 
 Train
 *****
+
+https://xgboost.readthedocs.io/en/latest/python/python_api.html#module-xgboost.training
 
 .. code-block:: python
 
@@ -156,9 +159,13 @@ Train
         evals=(), # What evaluation metrics to watch
         obj=None, feval=None, maximize=False,
         early_stopping_rounds=None, # After how many rounds of non-decreasing metrics to stop
-        evals_result=None, verbose_eval=True,
+        evals_result=None, # Dictionary to store the evaluation results
+        verbose_eval=True, # How often to print out the evaluation results
         xgb_model=None, callbacks=None
     )
+
+* :code:`evals` should be in the form :code:`evals=[(dtrain, 'train'), (dtest, 'test')]`
+* :code:`early_stopping_rounds` takes into account decreases in the last metric given in :code:`evals`.
 
 
 Cross validation
@@ -179,20 +186,82 @@ Cross validation
         callbacks=None, shuffle=True
     )
 
+
+
+
 Parameters
 **********
 
-colsample_bytree:
-   subsample ratio of columns when constructing each tree.
-learning_rate (eta):
-   Shrinkage of the new weights to make the boosting process more conservative
-max_depth:
-   Maximum depth of a tree. 
-alpha [default=0]:
-    L1 regularisation
-lambda [default=1]:
-    L2 regularisation
-scale_pos_weight:
-    Useful for imbalanced classes.
+Below are some of the most common parameters that go in both the :code:`xgboost.train` and :code:`xgboost.cv` functions. A complete reference can be found in https://xgboost.readthedocs.io/en/latest/parameter.html
 
+**Learning Task Parameters**
+
+objective
+   The objective to be minimised. Some examples are :code:`reg:squarederror`, :code:`reg:squaredlogerror`, :code:`reg:logistic`, :code:`binary:logistic`, :code:`multi:softmax`, :code:`multi:softprob`.
+
+eval_metric
+   metrics used for evaluation: :code:`rmse`, :code:`rmsle`, :code:`mae`, :code:`logloss`, :code:`mlogloss`, :code:`auc`
+
+**Control model complexity**
+
+max_depth [=6]:
+   Maximum depth of a tree. 
+gamma [=0]:
+   Minimum loss reduction required to make a further partition on a leaf node of the tree. The larger the value the more conservative the algorithm is.
+min_child_weight [default=1]
+   Minimum sum of instance weight needed in a child. Larger values make the algorithm more conservative.
+
+**Add randomness**
+
+subsample [=1]
+   subsample ratio of the training samples
+colsample_bytree [=1]
+   subsample ratio of columns when constructing each tree.
+
+**Learning rate**
+
+learning_rate (eta):
+   Shrinkage of the new weights to make the boosting process more conservative. When its value decreases, increase the :code:`num_boost_round` to compensate.
+
+**Regularisation**
+
+alpha [=0]:
+    L1 regularisation
+lambda [=1]:
+    L2 regularisation
+
+**Class imbalance**
+
+scale_pos_weight:
+    Useful for imbalanced classes. Class imbalanced classification is benefitted from using the auc evaluation metric. (https://xgboost.readthedocs.io/en/latest/tutorials/param_tuning.html).
+
+
+Feature importance 
+*******************
+
+
+.. code-block:: python
+
+    model.get_score(importance_type='weight|gain|cover|')
+    import xgboost as xgb
+    xgb.plot_importance(model, importance_type='weight|gain|cover|')
+
+
+Plot trees 
+***********
+.. code-block:: python
+
+    import xgboost as xgb
+    # Plot the 3rd tree from the model in axes ax
+    xgb.plot_tree(model, ax=ax, num_trees=3)
+
+
+Useful stuff
+############
+
+
+.. code-block:: python
+
+   from sklearn.metrics import mean_squared_error, accuracy_score
+   from sklearn.model_selection import train_test_split
 

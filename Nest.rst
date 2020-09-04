@@ -342,23 +342,23 @@ Errors can be returned using :code:`HttpException`
 Request objects
 ***************
 +-----------------------------------+--------------------------------------------+
-|:code:`@Request()`                 |    :code:`req`                             |
+| :code:`@Request()`                |    :code:`req`                             |
 +-----------------------------------+--------------------------------------------+
-|:code:`@Response(), @Res()`        |    :code:`res`                             |
+| :code:`@Response(), @Res()`       |    :code:`res`                             |
 +-----------------------------------+--------------------------------------------+
-|:code:`@Next()`                    |    :code:`next`                            |
+| :code:`@Next()`                   |    :code:`next`                            |
 +-----------------------------------+--------------------------------------------+
-|:code:`@Session()`                 |    :code:`req.session`                     |
+| :code:`@Session()`                |    :code:`req.session`                     |
 +-----------------------------------+--------------------------------------------+
-|:code:`@Param(key?: string)`       |    :code:`req.params/ req.params[key]`     |
+| :code:`@Param(key?: string)`      |    :code:`req.params/ req.params[key]`     |
 +-----------------------------------+--------------------------------------------+
-|:code:`@Body(key?: string)`        |    :code:`req.body / req.body[key]`        |
+| :code:`@Body(key?: string)`       |    :code:`req.body / req.body[key]`        |
 +-----------------------------------+--------------------------------------------+
-|:code:`@Query(key?: string)`       |    :code:`req.query / req.query[key]`      |
+| :code:`@Query(key?: string)`      |    :code:`req.query / req.query[key]`      |
 +-----------------------------------+--------------------------------------------+
-|:code:`@Headers(name?: string)`    |    :code:`req.headers / req.headers[name]` |
+| :code:`@Headers(name?: string)`   |    :code:`req.headers / req.headers[name]` |
 +-----------------------------------+--------------------------------------------+
-|:code:`@Ip()`                      |    :code:`req.ip`                          |
+| :code:`@Ip()`                     |    :code:`req.ip`                          |
 +-----------------------------------+--------------------------------------------+
 
 Example
@@ -391,8 +391,8 @@ An example of a basic CRUD controller is given below
         }
     
         @Post()
-        createUser(@Body(), createUserDto: CreateUserDto): Promise<User> {
-            return this.userService.create(createUserDto)
+        createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
+            return this.userService.create(createUserDto);
         }
     
         @Delete(':id')
@@ -401,9 +401,6 @@ An example of a basic CRUD controller is given below
         }
     
     }
-
-
-
 
 
 Services
@@ -496,111 +493,10 @@ Data Transfer Objects (DTOs) define how the data will be sent of the the network
 
 
 
-Swagger support
-###############
-
-First install the packages
-
-.. code-block:: typescript
-
-   npm install @nestjs/swagger
-   npm install swagger-ui-express
-
-
-Then add in main.ts
-
-.. code-block:: typescript
-
-
-   import { NestFactory } from '@nestjs/core';
-   import { AppModule } from './app.module';
-
-   // Import the necessary modules
-   import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-   
-   async function bootstrap() {
-     const app = await NestFactory.create(AppModule);
-   
-     // Set up options
-     const options = new DocumentBuilder()
-       .setTitle('Title')
-       .setDescription('Description')
-       .setVersion('1.0')
-       .addTag('tag')
-       .build();
-   
-     // Create the document
-     const document = SwaggerModule.createDocument(app, options);
-     SwaggerModule.setup('apidoc', app, document);
-     // swagger will be available in http://..../apidoc
-   
-   
-     await app.listen(3000);
-   }
-   bootstrap();
-
-Parameter support in swagger can be added by modifying the controller as follows:
-
-.. code-block:: typescript
-    :emphasize-lines: 3,13
-
-    import { Controller, Get, Param, Delete } from '@nestjs/common';
-    ...
-    import { ApiParam } from '@nestjs/swagger';
-
-    @Controller('book')
-    export class BookController {
-        constructor(
-            private readonly bookService: BookService
-        ){}
-        ... 
-        @ApiParam({type: "string", name: 'id'})
-        @Get(':id')
-        findOne(@Param('id') id) {
-            return this.bookService.findOne(id);
-        }
-        ...
-        }
-    }
-
-To see the expected fields of a request body, decorate the respective DTO with the 
-:code:`@ApiProperty()`.
-
-.. code-block:: typescript
-    :emphasize-lines: 1,4,7
-    :caption: create-book.dto.ts
-
-    import { ApiProperty } from '@nestjs/swagger';
-    
-    export class CreateBookDto {
-        @ApiProperty()
-        title: string;
-    
-        @ApiProperty()
-        year: number;
-    }
-
-Authentication in swagger can be enabled via :code:`@ApiBearerAuth()`
-
-.. code-block:: typescript
-    :emphasize-lines: 3,5
-
-    import { Controller, Get, Param, Delete } from '@nestjs/common';
-    ...
-    import { ApiBearerAuth } from '@nestjs/swagger';
-
-    @ApiBearerAuth()
-    @Controller('book')
-    export class BookController {
-        constructor(
-            private readonly bookService: BookService
-        ){}
-        ... 
-    }
-
-
 Type ORM
 ########
+
+https://typeorm.io/#/
 
 Install 
 ********
@@ -645,7 +541,7 @@ Entities
 
     import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
     
-    @Entity()
+    @Entity({name: "user"}) // This should match the entity name in the database.
     export class User {
       @PrimaryGeneratedColumn()
       id: number;
@@ -659,6 +555,9 @@ Entities
       @Column({ default: true })
       isActive: boolean;
     }
+
+The :code:`@Entity` and :code:`Column` decorators can take various arguments which can be found in 
+https://github.com/typeorm/typeorm/blob/master/docs/decorator-reference.md
 
 Entities should be included in the :code:`entities` part of the 
 :code:`TypeOrmModule.forRoot` declaration.
@@ -739,59 +638,9 @@ tedious. To address this issue, an alternative solution is provided. To
 automatically load entities, set the :code:`autoLoadEntities` property
 of the configuration object (passed into the :code:`forRoot()` method) to true.
 
-Nestjsx Crud
-************
-
-A basic set of CRUD services can be automatically generated with nestjsx crud:
-
-https://github.com/nestjsx/crud
-
-The service
-
-.. code-block:: typescript
-    :emphasize-lines: 3,8,9,10
-
-    import { Injectable } from "@nestjs/common";
-    import { InjectRepository } from "@nestjs/typeorm";
-    import { TypeOrmCrudService } from "@nestjsx/crud-typeorm";
-    
-    import { Company } from "./company.entity";
-    
-    @Injectable()
-    export class CompaniesService extends TypeOrmCrudService<Company> {
-      constructor(@InjectRepository(Company) repo) {
-        super(repo);
-      }
-    }
-
-The controller
-
-.. code-block:: typescript
-    :emphasize-lines: 2,7,8,9,10,11,13
-
-    import { Controller } from "@nestjs/common";
-    import { Crud, CrudController } from "@nestjsx/crud";
-    
-    import { Company } from "./company.entity";
-    import { CompaniesService } from "./companies.service";
-    
-    @Crud({
-      model: {
-        type: Company,
-      },
-    })
-    @Controller("companies")
-    export class CompaniesController implements CrudController<Company> {
-      constructor(public service: CompaniesService) {}
-    }
-
-
-
 
 Relations
 *********
-
-https://typeorm.io/#/
 
 One to one
 ----------
@@ -996,6 +845,191 @@ of the intermediate entity, that contains two many to one relations pointing
 to both *category* and *question*.
 
 
+TypeORM migrations
+******************
+
+
+.. code-block:: bash 
+
+    #Create migration
+    npm run typeorm migration:create -- -n firstMigration
+
+    #Show migrations
+    npm run typeorm migration:show
+    
+    #Run migrations
+    npm run typeorm migration:run
+    
+    #Revert last migration
+    npm run typeorm migration:revert
+
+
+
+Nestjsx Crud
+############
+
+A basic set of CRUD services can be automatically generated with nestjsx crud:
+
+https://github.com/nestjsx/crud
+
+First install
+
+.. code-block:: bash
+
+    npm install @nestjsx/crud
+    npm install @nestjsx/crud-typeorm
+    npm install class-transformer class-validator
+
+The service
+
+.. code-block:: typescript
+    :emphasize-lines: 3,8,9,10
+
+    import { Injectable } from '@nestjs/common';
+    import { InjectRepository } from '@nestjs/typeorm';
+    import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
+    import { Repository } from 'typeorm';
+    
+    import { User } from './user.entity';
+    
+    @Injectable()
+    export class UserService extends TypeOrmCrudService<User> {
+      constructor(
+        @InjectRepository(User)
+        userRepository: Repository<User>
+      ) {
+        super(userRepository);
+      }
+    }
+
+The controller
+
+.. code-block:: typescript
+    :emphasize-lines: 2,7,8,9,10,11,13
+
+    import { Controller } from '@nestjs/common';
+    import { Crud, CrudController } from '@nestjsx/crud';
+    
+    import { User } from './user.entity';
+    import { UserService } from './user.service';
+    
+    @Crud({
+      model: {
+        type: User,
+      },
+    })
+    @Controller('user')
+    export class UserController implements CrudController<User> {
+      constructor(public service: UserService) {}
+    }
+
+Overriding the default routes and other options can be found in
+https://github.com/nestjsx/crud/wiki/Controllers
+
+Swagger support
+###############
+
+First install the packages
+
+.. code-block:: typescript
+
+   npm install @nestjs/swagger
+   npm install swagger-ui-express
+
+
+Then add in main.ts
+
+.. code-block:: typescript
+
+
+   import { NestFactory } from '@nestjs/core';
+   import { AppModule } from './app.module';
+
+   // Import the necessary modules
+   import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+   
+   async function bootstrap() {
+     const app = await NestFactory.create(AppModule);
+   
+     // Set up options
+     const options = new DocumentBuilder()
+       .setTitle('Title')
+       .setDescription('Description')
+       .setVersion('1.0')
+       .addTag('tag')
+       .build();
+   
+     // Create the document
+     const document = SwaggerModule.createDocument(app, options);
+     SwaggerModule.setup('apidoc', app, document);
+     // swagger will be available in http://..../apidoc
+   
+   
+     await app.listen(3000);
+   }
+   bootstrap();
+
+Parameter support in swagger can be added by modifying the controller as follows:
+
+.. code-block:: typescript
+    :emphasize-lines: 3,13
+
+    import { Controller, Get, Param, Delete } from '@nestjs/common';
+    ...
+    import { ApiParam } from '@nestjs/swagger';
+
+    @Controller('book')
+    export class BookController {
+        constructor(
+            private readonly bookService: BookService
+        ){}
+        ... 
+        @ApiParam({type: "string", name: 'id'})
+        @Get(':id')
+        findOne(@Param('id') id) {
+            return this.bookService.findOne(id);
+        }
+        ...
+        }
+    }
+
+To see the expected fields of a request body, decorate the respective DTO
+and the entity with the :code:`@ApiProperty()`. E.g.
+
+.. code-block:: typescript
+    :emphasize-lines: 1,4,7
+    :caption: create-book.dto.ts
+
+    import { ApiProperty } from '@nestjs/swagger';
+    
+    export class CreateBookDto {
+        @ApiProperty()
+        title: string;
+    
+        @ApiProperty()
+        year: number;
+    }
+
+Authentication in swagger can be enabled via :code:`@ApiBearerAuth()`
+
+.. code-block:: typescript
+    :emphasize-lines: 3,5
+
+    import { Controller, Get, Param, Delete } from '@nestjs/common';
+    ...
+    import { ApiBearerAuth } from '@nestjs/swagger';
+
+    @ApiBearerAuth()
+    @Controller('book')
+    export class BookController {
+        constructor(
+            private readonly bookService: BookService
+        ){}
+        ... 
+    }
+
+
+
 Steps
 #####
 
@@ -1031,9 +1065,481 @@ Follow the steps below to create a basic CRUD back end.
 
 * Add the repository in the top level module's entities
 
-    * :code:`TypeOrmModule.forRoot({ ..., entities[<name>], ...})
+    * :code:`TypeOrmModule.forRoot({ ..., entities[<name>], ...})`
 
 
+Callbacks
+#########
+
+Callbacks are functions that take another function :code:`f(err, arg)` as an argument. If the regular function completes ok, it calls the argument as :code:`f(false, arg)`. If an error pops up in the regular function, it calls it argument as :code:`f(error)`. An example is shown below.
+
+
+.. code-block:: javascript
+    :caption: Callbacks
+
+    callbackFun = function(allOk, f) {
+        if (allOk) {
+            f(false, 1);
+        } else {
+            f(true);
+        }
+    }
+    
+    let state = true     // callback will return in ok state
+    // let state = false // callback will return in error state
+    
+    callbackFun(state, (err, arg) => {
+        if (err) {
+            console.log("in error state");
+        } else {
+            console.log("all good! " + arg);
+        }
+    })
+
+
+
+Promises
+########
+
+Some of the following material is taken from:
+https://itnext.io/javascript-promises-vs-rxjs-observables-de5309583ca2
+
+Construction phase:
+*******************
+
+A promise is an object that accepts a function as an argument.
+Let's call this function the :code:`executor`.
+The executor takes 2 arguments, the :code:`resolveExec` and the :code:`rejectExec`, both of
+which are functions.
+The executor function ends by calling either the :code:`resolveExec` or the :code:`rejectExec`
+functions. These functions can take 1 or more arguments.
+
+.. code-block:: javascript
+
+     myPromise = new Promise((resolveExec, rejectExec) => {
+       if (successful) {
+         resolveExec(resolveArg);
+       } else {
+         rejectExec(rejectArg)
+       }
+     })
+
+Usage phase
+***********
+
+A promise object is resolved (i.e. used) by invoking its :code:`then` member
+function.
+The :code:`then` function takes two functions as arguments.
+The first function is called if the :code:`resolveExec` function of the promise was called.
+The second function is called if the :code:`rejectExec` function of the promise was called.
+The arguments for the :code:`resolveExec` and :code:`rejectExec` are passed to the respective function
+arguments of the :code:`then` function.
+
+.. code-block:: javascript
+
+     myPromise.then(
+       // This will be called if the resolveExec was called in the promise
+       (argRes) => { // argRes is the same as the resolveArg in the promise
+        console.log(argRes);
+       },
+       // This will be called if the rejectExec was called in the promise
+       (argRej) => { // argRej is the same as the rejectArg in the promise
+        console.log(argRej);
+       }
+     )
+
+The promises are useful because the allow the delayed execution of a
+function (i.e. the resolve function) after some other operations have
+taken place in the executor function. It also offers the flexibility to
+call a second function (the reject function) when things have not gone as
+expected.
+
+Chaining promises:
+******************
+
+The result of the :code:`then` function is another promise, which is resolved with whatever argument was returned from the original promise. E.g.
+
+.. code-block:: javascript
+
+    // Original promise 
+    let pr = new Promise(res => { res('hello'); })
+
+    // pr1 is another promise, whose resolution argument will be 'hello world!'
+    let pr1 = pr.then(resArg => { return resArg + ' world!'; } );
+
+    // The resolution of pr1. Output will be 'hello world!'
+    pr1.then(resArg => { console.log(resArg); });
+
+This property allows chaining up promises as follows
+
+.. code-block:: javascript
+
+    let pr = new Promise(res => { res('hello'); })
+    
+    // Chained up promises. Output will still be 'hello world!'
+    pr.then(resArg => { return resArg + ' world!'; } ).then(resArg => { console.log(resArg); });
+
+Check also the following code: 
+
+.. code-block:: javascript
+
+    let pr = new Promise(res => { res('hello'); })
+
+    let pr1 = pr.then(resArg => {
+        return new Promise(                                         // The pending Promise
+            (res, rej) => {                                         //
+                res(resArg);   // Result will be 'Succeeded: hello' //
+                //rej(resArg); // Result will be 'Failed: hello'    //
+            }                                                       //
+        )                                                           //
+    })
+    
+    pr1.then(
+        (resArg) => { console.log('Succeeded: ' + resArg); },
+        (rejArg) => { console.log('Failed: ' + rejArg); }
+    );
+
+The resolution of :code:`pr` returns a pending promise. In this case, the resolution of the promise returned by :code:`pr.then`, i.e. the :code:`pr1`, will be resolved or rejected depending on the resolution of the pending promise.  
+
+More on this point in https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then
+
+Another example that will lead us to the :code:`async/await syntax`
+
+.. code-block:: javascript
+
+    // asyncTask(i) is a promise resolved with value i+1
+    function asyncTask(i) {
+        return new Promise(resolve => resolve(i + 1));
+    }
+    
+    function runAsyncTasks() {
+        return asyncTask(0) // promise resolved with value = 1
+            .then(res1 => { return asyncTask(res1); })  // promise resolved with value = 2
+            .then(res2 => { return asyncTask(res2); })  // promise resolved with value = 3
+    }
+
+    runAsyncTasks().then(result => console.log(result));
+
+Looking in :code:`runAsyncTasks`,
+:code:`asyncTask(0)` is a promise resolved with value 1. 
+:code:`.then(res1 => { return asyncTask(res1); })` is a promise resolved with value = 2
+and :code:`.then(res2 => { return asyncTask(res2); })` is a promise resolved with value = 3. 
+Therefore, the :code:`runAsyncTasks` function, returns a promise that is resolved with value = 3. 
+
+When we resolve it with 
+:code:`runAsyncTasks().then(result => console.log(result));` the result we get is 3.
+
+Async/Await
+***********
+
+Using the :code:`Async/Await`, the above example can be written as 
+
+.. code-block:: javascript
+
+    // asyncTask(n) : Promise that's resolved with argument n + 1.
+    function asyncTask(i) {
+        return new Promise(resolve => resolve(i + 1));
+    }
+    
+    async function runAsyncTasks() {
+        const res1 = await asyncTask(0);
+        const res2 = await asyncTask(res1);
+        return await asyncTask(res2);
+    }
+    
+    runAsyncTasks().then(result => console.log(result));
+
+The :code:`await` keyword pauses the execution of the asynchronous function and waits for the result of the promise's resolution. The :code:`await` keyword can only be used within a function that is declared as :code:`async`. The async function returns a promise that is resolved with whatever value the function returns. 
+
+If a promise is rejected, the :code:`await` keyword throws an error, with the rejection's argument. This has to be handled within a :code:`try/catch` loop.
+
+
+Examples 
+*********
+
+An example of a function returning a promise
+
+.. code-block:: javascript
+
+    function promiseReturningFunction(argIn) {
+      return new Promise((resolve, reject) => {
+        if (argIn) {
+          resolve("It's successful!");
+        } else {
+          reject("Try again");
+        }
+      })
+    }
+    
+    promiseReturningFunction(1).then(
+      (successMessage) => {
+        console.log("Yay! " + successMessage)
+      },
+      (failMessage) => {
+        console.log("Nope... " + failMessage)
+      }
+    );
+
+We can also create sleep functions...
+
+.. code-block:: javascript
+
+    function sleep(ms) {
+      return new Promise(
+        (resolve, reject) => {
+          setTimeout(() => {resolve('hello')}, ms)
+        }
+      )
+    }
+    
+    sleep(2000).then(
+      (x) => {
+        console.log("result is " + x);
+      }
+    );
+
+
+
+
+
+
+
+
+
+Observables 
+############
+
+The following material is taken from 
+https://itnext.io/javascript-promises-vs-rxjs-observables-de5309583ca2
+
+Simple example 
+
+.. code-block:: javascript
+
+    const  { Observable } = require('rxjs');
+    
+    let ob = new Observable(subscriberFunc);
+    
+    function subscriberFunc(observer) {
+        observer.next(4);
+    }
+    
+    ob.subscribe(x => console.log(x));
+
+More complete example
+
+.. code-block:: javascript
+
+    // Creation
+    const observable = new Observable(subscriberFunc);
+
+    function subscriberFunc(observer) {
+        const value = Math.random();
+        if (value <= 1/3.0)
+            observer.next(value);
+        else if (value <= 2/3.0)
+            observer.error("Value <= 2/3 (error)");
+        else
+            throw "Value > 2/3 (throw)"
+        observer.complete();
+    }
+
+    // Usage
+    observable.subscribe(nextFunc, errorFunc, completeFunc);
+    function nextFunc(value) {
+        console.log("Got value: " + value);
+    }
+    function errorFunc(error) {
+        console.log("Caught error: " + error);
+    }
+    function completeFunc() {
+        console.log("Completed");
+    }
+
+    // Or more compactly
+    observable.subscribe({
+        next(value) { console.log("Got value: " + value) },
+        error(err) { console.log("Caught error: " + err) },
+        complete() { console.log("Completed"); }
+    });
+
+The same with promises for comparison
+
+.. code-block:: javascript
+
+    // Creation
+    const promise = new Promise((resolve, reject) => {
+        const value = Math.random();
+        if (value <= 1/3.0)
+            resolve(value);
+        else if (value <= 2/3.0)
+            reject("Value <= 2/3 (reject)");
+        else
+            throw "Value > 2/3 (throw)"
+    });
+
+    // Usage
+    promise
+        .then(value => console.log("Got value: " + value))
+        .catch(error => console.log("Caught error: " + error));
+
+
+The construction of a promise takes as an argument the :code:`executor` function, that has as arguments two further functions, the :code:`resolve` and :code:`reject`. The :code:`executor` eventually calls one of the :code:`resolve` and :code:`reject` functions with arguments :code:`resolveArg` and :code:`rejectArg`.
+
+A promise's resolution occurs with the :code:`then` function, that takes as arguments two functions, which will be called depending on whether the :code:`executor` called the :code:`resolve` or the :code:`reject` function, with the respective arguments.
+
+The construction of observables, takes a function with a single argument, the :code:`observer`. The observer is an object with 3 methods, the :code:`next`, :code:`error` and :code:`complete`.
+
+An observable's 'resolution' happens with the :code:`subscribe` function, which takes 3 functions as arguments, which will be executed depending on which of the :code:`next`, :code:`error` and :code:`complete` were invoked in the :code:`observer`.
+
+
+Differences with promises
+*************************
+
+Single vs Multiple values
+-------------------------
+
+.. code-block:: javascript
+
+    const promise = new Promise(resolve => {
+        resolve(1);
+        resolve(2);
+        resolve(3);
+    });
+
+    promise.then(result => console.log(result));
+
+    // Output 
+    // 1
+
+.. code-block:: javascript
+
+    const observable = new Observable(observer => {
+        observer.next(1);
+        observer.next(2);
+        observer.next(3);
+    });
+
+    observable.subscribe(result => console.log(result));
+
+    // Output 
+    // 1
+    // 2
+    // 3
+
+
+Multicast vs Unicast
+--------------------
+
+Promises are Unicast, Observables are mulitcast
+
+.. code-block:: javascript
+
+    const promise = new Promise(resolve => {
+        console.log("Executing...");
+        resolve(Math.random());
+    });
+    promise.then(result => console.log(result));
+    promise.then(result => console.log(result));
+
+    //  Output
+    //  Executing...
+    //  0.1951561731912439
+    //  0.1951561731912439
+
+.. code-block:: javascript
+
+    const observable = new Observable(observer => {
+        console.log("Executing...");
+        observer.next(Math.random());
+    });
+    observable.subscribe(result => console.log(result));
+    observable.subscribe(result => console.log(result));
+
+    //  Output
+    //  Executing...
+    //  0.5884515904517829
+    //  Executing...
+    //  0.7974144930327094
+
+Eager vs. Lazy
+--------------
+
+* Promises are eager. The executor function is called as soon as the promise is created. 
+* Observables are lazy. The subscriber function is only called when a client subscribes to the observable.
+
+.. code-block:: javascript
+
+    const promise = new Promise(resolve => {
+        console.log("- Executing");
+        resolve();
+    });
+
+    console.log("- Subscribing");
+    promise.then(() => console.log("- Handling result"));
+
+    //  Output
+    //  - Executing
+    //  - Subscribing
+    //  - Handling result
+
+.. code-block:: javascript
+
+    const observable = new Observable(observer => {
+        console.log("- Executing");
+        observer.next();
+    });
+
+    console.log("- Subscribing");
+    observable.subscribe(() => console.log("- Handling result"));
+
+    //  Output
+    // - Subscribing
+    // - Executing
+    // - Handling result
+
+Asynchronous vs Synchronous Handlers
+------------------------------------
+
+* The handler functions of promises are executed asynchronously. That is, they are executed after all the code in the main program or the current function has been executed. 
+* The handler functions of observables are executed synchronously. That is, they are executed within the flow of the current function or the main program. 
+
+.. code-block:: javascript
+
+    console.log("- Creating promise");
+    const promise = new Promise(resolve => {
+        console.log("- Promise running");
+        resolve(1);
+    });
+    console.log("- Registering handler");
+    promise.then(result => console.log("- Handling result: " + result));
+    console.log("- Exiting main");
+    
+    //  Output
+    //  - Creating promise
+    //  - Promise running
+    //  - Registering handler
+    //  - Exiting main
+    //  - Handling result: 1
+
+
+.. code-block:: javascript
+
+    console.log("- Creating observable");
+    const observable = new Observable(observer => {
+        console.log("- Observable running");
+        observer.next(1);
+    });
+    console.log("- Registering handler");
+    observable.subscribe(v => console.log("- Handling result: " + v));
+    console.log("- Exiting main");
+    
+    //  Output
+    //  - Creating observable
+    //  - Registering handler
+    //  - Observable running
+    //  - Handling result: 1
+    //  - Exiting main
 
 
 The End
