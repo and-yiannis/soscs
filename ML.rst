@@ -2,9 +2,9 @@
 
 .. role:: red
 
-######
+################
 Machine Learning
-######
+################
 
 Classification
 ##############
@@ -239,21 +239,111 @@ scale_pos_weight:
 Feature importance 
 *******************
 
-
 .. code-block:: python
 
     model.get_score(importance_type='weight|gain|cover|')
     import xgboost as xgb
     xgb.plot_importance(model, importance_type='weight|gain|cover|')
 
+The arguments of :code:`importance_type` are 
+
+* 'weight': In all trees, the number of times a feature is used to split a node.
+* 'total_cover': the total number of samples each feature splits across all trees. I.e. the feature that is used in the top node, splits all samples, etc.
+* 'cover': the total cover divided by the weight
+* 'total_gain': In all trees, the total gain of a feature at each split node. If the information before and after splitting is i0 and i1 by entropy or Gini impurity, the gain is For (i0 - i1).
+* 'gain' = the total gain divided by weight
+
+Gain is probably the most meaningful in choosing feature importance.
+
+
+Automatic feature selection
+***************************
+
+From https://machinelearningmastery.com/feature-importance-and-feature-selection-with-xgboost-in-python/
+
+.. code-block:: python
+
+
+    from numpy import loadtxt
+    from numpy import sort
+    from xgboost import XGBClassifier
+    from sklearn.model_selection import train_test_split
+    from sklearn.metrics import accuracy_score
+    from sklearn.feature_selection import SelectFromModel
+    
+    dataset = loadtxt('pima-indians-diabetes.csv', delimiter=",")
+    
+    X = dataset[:, 0:8]
+    Y = dataset[:,8]
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.33, random_state=7)
+    
+    model = XGBClassifier(importance_type='gain')
+    model.fit(X_train, y_train)
+    
+    y_pred = model.predict(X_test)
+    predictions = [round(value) for value in y_pred]
+    accuracy = accuracy_score(y_test, predictions)
+    print("Accuracy: %.2f%%" % (accuracy * 100.0))
+    
+    # thresholds is a vector of importances for each feature.
+    thresholds = sort(model.feature_importances_)
+    print(thresholds)
+    for thresh in thresholds:
+        # Change the model so it uses features with threshold > thresh
+        selection = SelectFromModel(model, threshold=thresh, prefit=True)
+        # filter the train data
+        select_X_train = selection.transform(X_train)
+
+        # Retrain the model
+        selection_model = XGBClassifier()
+        selection_model.fit(select_X_train, y_train)
+        
+        # Estimate the outputs with the shrunk model
+        select_X_test = selection.transform(X_test)
+        y_pred = selection_model.predict(select_X_test)
+        predictions = [round(value) for value in y_pred]
+
+        # Reevaluate the accuracy
+        accuracy = accuracy_score(y_test, predictions)
+        print("Thresh=%.3f, n=%d, Accuracy: %.2f%%" %(thresh, select_X_train.shape[1], accuracy*100.0))
+
+
 
 Plot trees 
 ***********
+
 .. code-block:: python
 
     import xgboost as xgb
     # Plot the 3rd tree from the model in axes ax
     xgb.plot_tree(model, ax=ax, num_trees=3)
+
+
+Randomised search of parameters
+*******************************
+
+.. code-block:: python
+
+    params= {
+        "max_depth" : [2,3,4,5,6],
+        "learning_rate": [0.1, 0.3, 0.5, 0.8],
+        "colsample_bytree": [0.7, 1],
+        "reg_alpha": [0, 1],
+        "reg_lambda": [0, 1]
+    }
+    from sklearn.model_selection import RandomizedSearchCV
+    basic_model = xgb.XGBClassifier()
+    
+    random_cv = RandomizedSearchCV(estimator=basic_model,
+                                   param_distributions=params,
+                                   cv=4, n_iter=20,
+                                   n_jobs=-1, verbose=1,
+                                   return_train_score=True
+                                  )
+    random_cv.fit(X_train, Y_train)
+
+
 
 
 Useful stuff
@@ -262,6 +352,6 @@ Useful stuff
 
 .. code-block:: python
 
-   from sklearn.metrics import mean_squared_error, accuracy_score
+   from sklearn.metrics import mean_squared_error, accuracy_score, confusion_matrix
    from sklearn.model_selection import train_test_split
 
