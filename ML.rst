@@ -128,6 +128,43 @@ The ROC curve plots the False Positive Rate against the True Positive rate, as t
 
 A classifier that always says it's not there (:math:`\hat{y}=0`), will have TPR=FPR=0, and will lie at the bottom left corner of the graph. A classifier that says it's allways there (:math:`\hat{y}=1`), will have TPR=FPR=1, and will lie at the top right corner of the graph. Ideally, we want a classifier that always says it's there when it is (TPR=1) and never says it's there when it's not (FPR=0). This represents the top left corner. This gives rise to the requirement that a classifier's ROC curve passes as close as possible from the top right corner.
 
+One-hot encoding
+****************
+
+One hot encoding can be achieved in either of the following ways.
+
+.. code-block:: python
+
+
+    # Method 1 (faster)
+    import pandas as pd
+    x = ['a', 'b', 'a', 'c']
+    pd.get_dummies(x)
+    
+    # Method 2, more flexible but more code.
+    import numpy as np
+    from sklearn.preprocessing import OneHotEncoder
+    x = np.array(['a', 'b', 'a', 'c']).reshape(-1, 1)
+    enc = OneHotEncoder()
+    enc.fit(x)
+    enc.transform(x).toarray()
+    enc.get_feature_names(['prefix'])
+
+
+
+Useful stuff
+************
+
+
+.. code-block:: python
+
+   from sklearn.metrics import mean_squared_error, accuracy_score, confusion_matrix
+   from sklearn.model_selection import train_test_split
+
+    
+    
+
+ 
 
 
 XGBoost
@@ -233,7 +270,9 @@ lambda [=1]:
 **Class imbalance**
 
 scale_pos_weight:
-    Useful for imbalanced classes. Class imbalanced classification is benefitted from using the auc evaluation metric. (https://xgboost.readthedocs.io/en/latest/tutorials/param_tuning.html).
+    Useful for imbalanced classes.
+
+The auc evaluation metric is also preferred for imbalanced classes. (https://xgboost.readthedocs.io/en/latest/tutorials/param_tuning.html).
 
 
 Feature importance 
@@ -242,8 +281,7 @@ Feature importance
 .. code-block:: python
 
     model.get_score(importance_type='weight|gain|cover|')
-    import xgboost as xgb
-    xgb.plot_importance(model, importance_type='weight|gain|cover|')
+    xgboost.plot_importance(model, importance_type='weight|gain|cover|')
 
 The arguments of :code:`importance_type` are 
 
@@ -254,6 +292,49 @@ The arguments of :code:`importance_type` are
 * 'gain' = the total gain divided by weight
 
 Gain is probably the most meaningful in choosing feature importance.
+
+
+Plot trees 
+***********
+
+Plot the  a specific tree
+
+.. code-block:: python
+
+    import xgboost as xgb
+    # Plot the 3rd tree from the model in axes ax
+    xgb.plot_tree(model, ax=ax, num_trees=3)
+
+Get the trees as json
+
+.. code-block:: python
+
+    model.get_dump(dump_format='json')
+
+
+
+Randomised search of parameters
+*******************************
+
+.. code-block:: python
+
+    params= {
+        "max_depth" : [2,3,4,5,6],
+        "learning_rate": [0.1, 0.3, 0.5, 0.8],
+        "colsample_bytree": [0.7, 1],
+        "reg_alpha": [0, 1],
+        "reg_lambda": [0, 1]
+    }
+    from sklearn.model_selection import RandomizedSearchCV
+    basic_model = xgb.XGBClassifier()
+    
+    random_cv = RandomizedSearchCV(estimator=basic_model,
+                                   param_distributions=params,
+                                   cv=4, n_iter=20,
+                                   n_jobs=-1, verbose=1,
+                                   return_train_score=True
+                                  )
+    random_cv.fit(X_train, Y_train)
 
 
 Automatic feature selection
@@ -310,48 +391,5 @@ From https://machinelearningmastery.com/feature-importance-and-feature-selection
 
 
 
-Plot trees 
-***********
 
-.. code-block:: python
-
-    import xgboost as xgb
-    # Plot the 3rd tree from the model in axes ax
-    xgb.plot_tree(model, ax=ax, num_trees=3)
-
-
-Randomised search of parameters
-*******************************
-
-.. code-block:: python
-
-    params= {
-        "max_depth" : [2,3,4,5,6],
-        "learning_rate": [0.1, 0.3, 0.5, 0.8],
-        "colsample_bytree": [0.7, 1],
-        "reg_alpha": [0, 1],
-        "reg_lambda": [0, 1]
-    }
-    from sklearn.model_selection import RandomizedSearchCV
-    basic_model = xgb.XGBClassifier()
-    
-    random_cv = RandomizedSearchCV(estimator=basic_model,
-                                   param_distributions=params,
-                                   cv=4, n_iter=20,
-                                   n_jobs=-1, verbose=1,
-                                   return_train_score=True
-                                  )
-    random_cv.fit(X_train, Y_train)
-
-
-
-
-Useful stuff
-############
-
-
-.. code-block:: python
-
-   from sklearn.metrics import mean_squared_error, accuracy_score, confusion_matrix
-   from sklearn.model_selection import train_test_split
 

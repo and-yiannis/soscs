@@ -251,6 +251,8 @@ Sequences
    rep(1:3, 5) # Repeat 1 to 3 5 times
    rep(1:3, each=5) # Repeat each of 1 to 3 5 times
 
+   seq_along(<ts_object>) # create a sequence [1:length(<ts_object>)]
+
 Missing values
 **************
 
@@ -697,12 +699,14 @@ This Chapter holds notes from the Forecasting: Principles and Practice book, by 
 Time series graphics
 ********************
 
+Below are examples of plots that help investigate structure in time series.
 
 Difference between seasonal and cyclic data
 ===========================================
 
+
 * Seasonal data have fixed frequency
-* Cyclic data have frequency that is not exact.
+* Cyclic data have cycles but not of fixed frequency.
   
   
 
@@ -799,7 +803,7 @@ All the forecasts equal the mean of the historical data
 **Naive**
 
 For naïve forecasts, we simply set all forecasts to be the value of the last
-observation. 
+observation. When testing an algorithm on a new data set, it should beat the naive method. 
 
 .. code-block:: r
 
@@ -873,6 +877,8 @@ Fitted values are the predictions of the training data point t based on all
 the previous time points. The fitted values are not true forecasts if the 
 model's parameters are estimated using all the available data, including those
 that come after t.
+
+Fitted values can be found with the :code:`fitted` function.
   
 Residuals
 ---------
@@ -894,6 +900,8 @@ values of a time series
 Prediction intervals are calculated based on the assumption that the residuals
 are both uncorrelated and Normally distributed. If either of these conditions
 does not hold, the prediction intervals may be invalid.   
+
+Residuals can be found with the :code:`residuals` function.
 
 Residual checking
 -----------------
@@ -954,6 +962,11 @@ Checking for normal distribution
   
 Evaluating forecast accuracy
 ============================
+Calculating forecasts
+---------------------
+
+Forecasts can be calculated with the :code:`forecast` and :code:`predict` functions. The first also calculates confidence intervals.
+
   
 Metrics
 -------
@@ -1294,6 +1307,56 @@ Auto arima
 Information Criteria should not be used for selecting between different orders of differencing (:math:`d`), because differencing changes the data on which the likelihood is computed. Some other approach has to be used to first identify :math:`d` and the information criteria can then be used for estimating :math:`p` and :math:`q`. The value of :math:`d` can be estimated using the KPSS stationarity test. 
 
 Some times its not possible to find a model that passes all the residual tests. In these cases, the model that scores best at a test set is used.
+
+
+Dynamic regression models
+*************************
+
+
+The following code will fit an arima model of order 1,1,0 with regressors x.
+
+.. code-block:: r
+
+    fit <- Arima(y, xreg=x, order=c(1, 1, 0)
+
+The model fitted is
+
+.. math:: 
+
+    y'_t = \beta_1x'_t + \eta'_t
+
+    \eta'_t = \phi_1\eta'_{t-1} + \epsilon_t
+
+where :math:`(.)'` denotes time differences (e.g. :math:`y'_t = y_t - y_{t-1}`). 
+The first equation can be seen as a regression with autocorrelated noise :math:`\eta`. The second is the ARIMA(1,1,0) model, with white noise :math:`\epsilon`.
+
+Note that both the regression and the arima part are fitted on the differenced data.
+
+The residuals can be obtained with
+
+.. code-block:: r
+
+    # Get the regression residual (\eta)
+    residuals(fit, type='regression')
+    # Get the arima residual (\epsilon)
+    residuals(fit, type='innovation')
+
+
+Forecasts can be made with the :code:`forecast` function
+
+.. code-block:: r
+
+Fourier coefficients can be used as regressors. :code:`K` is the number of coefficients used to build the regressors. Their number is usually found by minimising one of the information criteria. The :doce:`fourier` function seems to reconstruct a time series using the :code:`K` most important fourier coefficients of the training data. 
+
+.. code-block:: r
+
+    fit <- auto.arima(data, 
+                      xreg=fourier(data, K=K)
+                      seasonal=FALSE)
+    fc <- forecast(fit,
+                   xreg=fourier(data, K=K, h=12))
+
+
 
 
 

@@ -244,6 +244,15 @@ The `InMemoryDataService` in the above is the service that provides the fake bac
 and create a class that implements `InMemoryDbService`.
 
 
+HTML template interaction
+#########################
+
+* :code:`#` - variable declaration
+* :code:`( )` - event binding
+* :code:`[ ]` - property binding
+* :code:`[( )]` - two-way property binding
+* :code:`{{ }}` - interpolation
+* :code:`*` - structural directives
 
 
 Dictionary

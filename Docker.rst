@@ -183,6 +183,22 @@ Help on ps
 
   docker ps --help
 
+Networking
+**********
+
+List all docer networks
+
+.. code-block:: bash
+
+    docker network ls
+
+Inspect the network :code:`<network_name>`. The name can be found from the :code:`ls` command.
+
+.. code-block:: bash
+
+    docker inspect <network_name> 
+
+
 Image layers and Build Cache
 ****************************
 

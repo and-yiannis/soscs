@@ -502,3 +502,39 @@ Work as root
 
     su
 
+Domain resolution issues
+************************
+WSL (Windows Subsystem for Linux) sometimes encounters DNS resolution problems. E.g.
+
+https://github.com/microsoft/WSL/issues/4285#issuecomment-522201021
+
+https://gist.github.com/coltenkrauter/608cfe02319ce60facd76373249b8ca6
+
+A solution in this case is the following:
+
+
+1. Create a file: /etc/wsl.conf.
+2. Put the following lines in the file in order to ensure the your DNS changes do not get blown away
+
+.. code-block:: 
+
+    [network]
+    generateResolvConf = false
+
+3. In a cmd window, run wsl --shutdown
+4. Restart WSL2
+5. Create a file: /etc/resolv.conf. If it exists, replace existing one with this new file.
+6. Put the following line in the file
+
+.. code-block:: 
+
+    nameserver 8.8.8.8 
+
+7. Repeat step 3 and 4. You will see git working fine now.
+
+In the :code:`nameserver` part, you can use a different DNS server instead of of 8.8.8.8 which is a Google's. 
+
+You can use for example the DNS server of the windows machine that runs wsl. This can be found by running :code:`ipconfig /all` in a cmd window. It can also be found by running :code:`nslookup` in a cmd window as well. 
+
+
+

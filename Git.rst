@@ -14,7 +14,7 @@ Git
 
 
 Config
-******
+######
 
 :code:`git config --list`
     * lists configuration
@@ -26,7 +26,7 @@ Config
     * Set vimdiff as the default diff tool
 
 Add files
-*********
+#########
 
 :code:`git init`
     * start tracking the current directory
@@ -44,14 +44,14 @@ Add files
 
 
 Status, log, changes
-********************
+####################
 
 :code:`git status`
     * Get the status of the repository
     * :code:`-s`: short status
 
 Log
-***
+###
 
 :code:`git log`
     * Shows the history of commits
@@ -66,7 +66,7 @@ Log
     * :code:`--all`: shows all branches
 
 Diff
-****
+####
 
 :code:`git diff`
     * shows differences between the staged and unstaged files
@@ -91,7 +91,7 @@ Replacing :code:`diff` with :code:`difftool` will carry out the diff in the sele
 
 
 Change files
-************
+############
 
 :code:`git rm file`
     * Deletes file and also removes it from the staging area.
@@ -115,7 +115,7 @@ Change files
 
 
 Tags
-****
+####
 
 :code:`git tag`
     * shows the tags
@@ -148,7 +148,7 @@ Tags are not pushed by default. It will have to be done explicitly.
 
 
 Aliases
-*******
+#######
 
 :code:`git config --global alias.co checkout`
     * Create aliases for certain commands. The above allows to write git co instead of git checkout 
@@ -168,7 +168,7 @@ Therefore use :code:`git rm log/\*.log` instead of :code:`git rm log/*.log`
 
 
 test begin
-**********
+##########
 
 :code:`git branch`
     * Lists all the branches
@@ -187,7 +187,7 @@ test begin
         Shows the unmerged branches
 
 Branching
-*********
+#########
 
 :code:`git branch`
     * Lists all branches
@@ -215,7 +215,7 @@ Branching
 
 
 Remotes
-*******
+#######
 
 :code:`git remote -v`
     * Show which remotes you are using with aliases
@@ -234,7 +234,7 @@ Remotes
 
 
 Remote Branching
-****************
+################
 
 :code:`git checkout -b <local_name_branch> <online_branch_name>`
     * checks out an online branch and creates a local copy with the given name, e.g. git checkout -b serverfix origin/serverfix
@@ -260,15 +260,15 @@ Remote Branching
 
 
 Rebasing
-********
+########
 
 **Basic rebase**
 
 .. code-block:: bash
 
-  git checkout dev
-  
-  git rebase master
+   git checkout dev
+   
+   git rebase master
 
 The above will find all the changes to dev after its last common ancestor with master and replay them at the head of master. The new base of dev therefore, will be the head of master (rebase)
 
@@ -276,7 +276,7 @@ The above will find all the changes to dev after its last common ancestor with m
 
 .. code-block:: bash
 
-  git rebase --onto br1 br2 br3
+   git rebase --onto br1 br2 br3
 
 This will take all the changes of br3 after its last common ancestor with br2 and replay them on top of br1. In other words it rebases br3 after br2 on top of br1.  
 
@@ -291,13 +291,13 @@ and that we want to squash commits `c3` and `c4`. This can be done interactively
 
 .. code-block:: bash
 
-  git rebase -i HEAD~3
+   git rebase -i HEAD~3
 
 or
 
 .. code-block:: bash
 
-  git rebase -i c2
+   git rebase -i c2
 
 (where c2 is the commit number)
 
@@ -305,28 +305,28 @@ An interactive window will then open, where git asks if we want to squash, keep 
 
 .. code-block:: bash
 
-  pick c3 <commit_message>
-  pick c4 <commit_message>
-  pick HEAD <commit_message>
-  
-  # Rebase 42e44ea..bbdf516 onto 42e44ea (4 commands)
-  #
-  # Commands:
-  # p, pick = use commit
-  # r, reword = use commit, but edit the commit message
-  # e, edit = use commit, but stop for amending
-  # s, squash = use commit, but meld into previous commit
-  # f, fixup = like "squash", but discard this commit's log message
-  # x, exec = run command (the rest of the line) using shell
-  # d, drop = remove commit
-  #
-  # These lines can be re-ordered; they are executed from top to bottom.
-  #
-  # If you remove a line here THAT COMMIT WILL BE LOST.
-  #
-  # However, if you remove everything, the rebase will be aborted.
-  #
-  # Note that empty commits are commented out
+    pick c3 <commit_message> 
+    pick c4 <commit_message>
+    pick HEAD <commit_message>
+ 
+    # Rebase 42e44ea..bbdf516 onto 42e44ea (4 commands)
+    #
+    # Commands:
+    # p, pick = use commit
+    # r, reword = use commit, but edit the commit message
+    # e, edit = use commit, but stop for amending
+    # s, squash = use commit, but meld into previous commit
+    # f, fixup = like "squash", but discard this commit's log message
+    # x, exec = run command (the rest of the line) using shell
+    # d, drop = remove commit
+    #
+    # These lines can be re-ordered; they are executed from top to bottom.
+    #
+    # If you remove a line here THAT COMMIT WILL BE LOST.
+    #
+    # However, if you remove everything, the rebase will be aborted.
+    #
+    # Note that empty commits are commented out
   
 
 The top commit (c3) cannot be squashed. If it needs to be removed, simply delete the line. 
@@ -335,17 +335,20 @@ If you simply want to squash the 3 commits into 1, change the 1st 3 lines to
 
 .. code-block:: bash
 
-  r c3 <commit_message>
-  f c4 <commit_message>
-  f HEAD <commit_message>
+   r c3 <commit_message>
+   f c4 <commit_message>
+   f HEAD <commit_message>
+
   
 This will squash the HEAD and c4 into c3, and will open a new interactive window for editing the overall commit message. 
+
 
 This method should be used for branches that haven't been pushed to the server. 
 
 
+
 Stashing
-********
+########
 
 :code:`git stash`
 
@@ -358,13 +361,13 @@ Stashing
 :code:`git stash clear`
 
 Ignore different line endings
-*****************************
+#############################
 
 :code:`git config --global core.autocrlf true`
 
 
 Git Tracing
-***********
+###########
 
 :code:`GIT_CURL_VERBOSE=1`
 
@@ -378,7 +381,7 @@ in windows, write
 Reset them to 0 when done. 
 
 Git credential.helper
-*********************
+#####################
 
 This can be set to :code:`<store>` or :code:`<cache>` for unix systems. In this case, and when we connect to a remote repository over https, which requires a password, the password is either stored in a .gitcredentials file or it is cached in memory, where it is deleted after a certain period of time. The commands to change between the 2 are
 
@@ -390,4 +393,271 @@ These configurations can be changed from the :code:`.gitconfig` file as well.
 
 For windows, the respective options are :code:`<wincred>` and :code:`<manager>`. The first uses the windows credentials and the second uses the credential manager. 
 
+Gitlab setup 
+############
 
+Installation
+************
+
+Set up instructions can be found in 
+https://docs.gitlab.com/omnibus/docker/
+
+Pull the image you want to install
+
+.. code-block:: bash
+
+    docker pull gitlab/gitlab-ce:11.7.0-ce.0
+
+To see a list of images, visit
+https://hub.docker.com/r/gitlab/gitlab-ce/tags
+
+Set up gitlab directories
+
+.. code-block:: bash
+
+    export GITLAB_HOME=/srv/gitlab
+    mkdir $GITLAB_HOME/data
+    mkdir $GITLAB_HOME/logs
+    mkdir $GITLAB_HOME/config
+
+Start the container
+
+.. code-block:: bash
+
+   sudo docker run --detach \
+     --hostname gitlab.example.com \
+     --publish 443:443 --publish 80:80 --publish 22:22 \
+     --name gitlab \
+     --restart always \
+     --volume $GITLAB_HOME/config:/etc/gitlab \
+     --volume $GITLAB_HOME/logs:/var/log/gitlab \
+     --volume $GITLAB_HOME/data:/var/opt/gitlab \
+     gitlab/gitlab-ce:11.7.0-ce.0
+
+If there is no web address to which the gitlab will be listening to, just remove the :code:`hostname` from the above. 
+
+You can find the ip address the container is running using
+
+.. code-block:: bash
+
+   docker network ls
+   docker network inspect bridge
+
+Backup
+******
+
+https://docs.gitlab.com/ee/raketasks/backup_restore.html
+
+Backing up data
+===============
+
+.. code-block:: bash
+
+   # For Gitlab 12.1 and earlier
+   docker exec -t <container_name> gitlab-rake gitlab:backup:create
+
+   # For Gitlab later than 12.1
+   docker exec -t <container_name> gitlab-backup create
+
+The backup will be found in $GITLAB_HOME/data/backups.
+
+Backing up configuration files
+==============================
+
+In addition to backing up data, the
+
+.. code-block:: bash
+
+   $GITLAB_HOME/config
+
+folder has to be backed up, in a **separate** location from the rest of the data. This folder contains the encryption keys to the data, and storing them together defeats the purpose of encryption.
+
+Restore
+*******
+
+A backup can only be restored to **exactly the same version and type (CE/EE)**.
+
+Preparation: 
+
+1. The backup file should be in the :code:`$GITLAB_HOME/data/backups` folder.
+2. Restore also the :code:`$GITLAB_HOME/config` folder.
+
+Once everything's in place, run the following...
+
+
+.. code-block:: bash
+
+    # Stop the processes that are connected to the database
+    docker exec -it <name of container> gitlab-ctl stop unicorn
+    docker exec -it <name of container> gitlab-ctl stop puma
+    docker exec -it <name of container> gitlab-ctl stop sidekiq
+    
+    # Verify that the processes are all down before continuing
+    docker exec -it <name of container> gitlab-ctl status
+    
+    # Run the restore
+    docker exec -it <name of container> gitlab-backup restore BACKUP=mybackup
+
+    # Use this for <= 12.1
+    # docker exec -it <name of container> gitlab-rake gitlab:backup:restore BACKUP=mybackup
+    
+    # Restart the GitLab container
+    docker restart <name of container>
+    
+    # Check GitLab, after the container is up and healty...
+    docker exec -it <name of container> gitlab-rake gitlab:check SANITIZE=true
+
+* Note that gitlab appends a :code:`_gitlab_backup.tar` suffix to the argument of the :code:`BACKUP`. So, if the bakup file name is :code:`mybackup_gitlab_backup.tar`, the restore command should use :code:`BACKUP=mybackup` only.
+
+* Sometimes there can be a permissions issue with the backup file. In these cases do the following:
+
+.. code-block:: bash
+
+    docker exec -it <container_name> /bin/bash
+    cd /var/opt/gitlab/backups
+    chown git:git <name_of_the_back_up_file>
+
+Docker Runner
+*************
+
+Installation
+============
+
+Create the config directory for the gitlab-runner
+
+.. code-block:: bash
+
+  mkdir -p /srv/gitlab-runner/config
+
+Get the docker image and start the runner.
+
+.. code-block:: bash
+
+  docker run -d --name gitlab-runner --restart always \
+    -v /srv/gitlab-runner/config:/etc/gitlab-runner \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    gitlab/gitlab-runner:v11.7.0
+
+
+Things to watch: 
+
+* The :code:`gitlab-runner` tag (:code:`11.7.0` in the example above) should match the version of the gitlab installation. A list of tags can be found here: 
+https://hub.docker.com/r/gitlab/gitlab-runner/tags/
+
+Registration
+============
+
+Once the runner is installed, it must be registred. It can be registred within gitlab either as a shared runner from the gitlab admin, either as a project specific runner from the individual project. We will describe how it can be registered as a shared runner.
+
+In gitlab, go to the Admin Area > Runners.
+
+Within there you will see a *Set up a shared Runner manually* section. You will need the following information
+
+* :code:`URL`
+* :code:`registration token`
+
+In the command line run 
+
+.. code-block:: bash
+
+  docker run -it gitlab-runner gitlab-runner register
+
+The first :code:`gitlab-runner` is the name of the container and the second is a command to be executed within the container. 
+
+Fill in the following information
+
+.. code-block:: 
+
+   Please enter the gitlab-ci coordinator URL (e.g. https://gitlab.com/):
+   <enter the URL from above>
+
+   Please enter the gitlab-ci token for this runner:
+   <enter the registration token from above> 
+
+   Please enter the gitlab-ci description for this runner:
+   <enter a name for this runner>
+
+   Please enter the gitlab-ci tags for this runner (comma separated):
+   <enter the tags for this runner>
+
+   Please enter the executor: ...
+   docker
+
+   Plsease enter the default Docker image (e.g. ruby:2.1):
+   alpine
+
+Notes
+-----
+
+**Default image**
+The default docker image will be the one used if there is not one specified in the .yml file. Usually, it should be specified, so the default image might not matter that much
+
+**Tags**
+Runners won't start unless the job has the same tag as the runner does.  For example, if the runner has the tag production, then the job in the .gitlab-ci.yml file has to have the tag production as well.
+
+**Clone_url**
+
+In the :code:`config.toml` file, add the url of the gitlab installation in the :code:`[[runners]]` section. 
+
+.. code-block::
+
+   [[runners]]
+     ...
+     ...
+     clone_url = "http://my.gitlab.url.com"
+     ...
+
+
+If the clone is not set, the runner may not know where is the repository, and it can fail during the cloning, returning an error like 
+
+
+.. code-block:: 
+
+    fatal: unable to access 'http://gitlab-ci-token:xxxxxxxxxxxx@s98usdofjjf/path/to/repo.git': Could not resolve host: s98usdofjjf
+
+
+For more info see: https://docs.gitlab.com/runner/configuration/advanced-configuration.html#how-clone_url-works
+
+
+If the installation was made with docker, the address can be the address that pops out as :code:`Gateway` when running 
+
+.. code-block:: bash
+
+   docker network inspect bridge 
+
+which could be something like :code:`172.17.0.1`
+
+After finishing registration, it's worth restarting the gitlab-runner container by running
+
+.. code-block:: bash
+
+   docker restart gitlab-runner
+
+
+The gitlab-ci.yml file
+======================
+
+Now create a :code:`.gitlab-ci.yml` file at the top level of the project. A minimal file that can be used for testing is the following
+
+.. code-block:: 
+
+    default:
+        image: alpine
+        tags: 
+            - tag1
+        script: 
+            - ls
+            - <any other command you want to execute> 
+      
+
+The reference for the file can be found in https://docs.gitlab.com/ee/ci/yaml/README.html   
+
+When commiting the code, gitlab will notice the existence of the :code:`.gitlab-ci.yml` file and will run this automatically. 
+
+
+Linking runners to specific projects
+====================================
+
+Going to :code:`Admin > Overview > Runners` and selecting a specific runner, allows linking a runner to a specific project, by selecting :code:`Enable` in the :code:`Restrict projects for this Runner`.
+
+This makes the specific runner not a shared runner any more, and can be only used to serve specific projects. **Note** This process is **non-reversible**. Once a runner stops being a shared runner by means of the above process, it cannot be a shared runner again. 
