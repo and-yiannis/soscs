@@ -247,6 +247,45 @@ The Readline Library allows vi mode in terminal applications, such as python and
 
     set editing-mode vi
 
+Cron
+****
+
+Cron can be used to run jobs at specified times
+
+To add a job run 
+
+.. code-block:: bash
+
+    crontab -e
+
+This will open the file where the job can be written. 
+
+The format is as follows
+
+::
+
+    # ------------min (0-59)
+    # | ----------hour (0-23)
+    # | | --------day of month (1-31)
+    # | | | ------month (1-12)
+    # | | | | ----day of week (0 - 6) (0 to 6 are Sunday to 
+    # | | | | |   Saturday, or use names; 7 is also Sunday)
+    # | | | | |
+    # * * * * *   command to execute
+
+Some examples
+
+::
+
+    * * * * * <cmd>        # Every minute
+    */5 * * * * <cmd>      # Every 5 minutes
+    5 * * * * <cmd>        # Every hour at minute 5
+    0, 5, 10 * * * * <cmd> # Every hour at minutes 0, 5, 10
+    0 0 * * 1-5 <cmd>      # Every day from Monday to Friday at 00:00
+
+The cron job logs can be found in :code:`/var/log/cron`.
+
+
 Ls
 **
 :code:`-i` shows the file inode.
@@ -363,6 +402,9 @@ will output the :code:`/dev/vda5` line and will feed it to awk, which will retur
 SSH keys
 ********
 
+General
+=======
+
 To generate a private- public key pair use 
 
 .. code-block:: bash
@@ -382,6 +424,11 @@ Put the public key (the text) in the :code:`~/.ssh/authorized_keys` file on the 
 
     cat id_rsa.pub | ssh username@servername.com "mkdir -p ~/.ssh/ && cat >> ~/.ssh/authorized_keys"
 
+The .ssh folder in the server should have permission :code:`700` and the :code:`authorized_keys` file should have permission :code:`600`. Wrong permissions is a common cause of connectivity issues.
+
+
+Config files
+============
 
 A shortcut to connect to the server can be made by creating a :code:`~/.ssh/config` file on the client machine that will have
 
@@ -407,6 +454,9 @@ will have the same result as typing
     ssh username@server.com
 
 (i.e. connecting to the server. )
+
+Port forwarding
+===============
 
 If the server sits behind a firewall, such that we first have to connect to server1 before connecting to server2, we can solve this using port forwarding. The config file entry can be modified as follows
 

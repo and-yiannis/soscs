@@ -402,46 +402,64 @@ Installation
 Set up instructions can be found in 
 https://docs.gitlab.com/omnibus/docker/
 
-Pull the image you want to install
+To install a gitlab version run the following
 
-.. code-block:: bash
-
-    docker pull gitlab/gitlab-ce:11.7.0-ce.0
-
-To see a list of images, visit
-https://hub.docker.com/r/gitlab/gitlab-ce/tags
-
-Set up gitlab directories
 
 .. code-block:: bash
 
     export GITLAB_HOME=/srv/gitlab
-    mkdir $GITLAB_HOME/data
-    mkdir $GITLAB_HOME/logs
-    mkdir $GITLAB_HOME/config
+    mkdir -p $GITLAB_HOME/data
+    mkdir -p $GITLAB_HOME/logs
+    mkdir -p $GITLAB_HOME/config
 
-Start the container
+    docker stop gitlab
+    docker rm gitlab
 
-.. code-block:: bash
+    docker run --detach \
+      --publish 80:80 --publish 443:443  --publish 22:22 \
+      --name gitlab \
+      --restart always \
+      --volume $GITLAB_HOME/config:/etc/gitlab \
+      --volume $GITLAB_HOME/logs:/var/log/gitlab \
+      --volume $GITLAB_HOME/data:/var/opt/gitlab \
+      gitlab/gitlab-ce:11.7.12-ce.0
 
-   sudo docker run --detach \
-     --hostname gitlab.example.com \
-     --publish 443:443 --publish 80:80 --publish 22:22 \
-     --name gitlab \
-     --restart always \
-     --volume $GITLAB_HOME/config:/etc/gitlab \
-     --volume $GITLAB_HOME/logs:/var/log/gitlab \
-     --volume $GITLAB_HOME/data:/var/opt/gitlab \
-     gitlab/gitlab-ce:11.7.0-ce.0
+This will install the :code:`gitlab-ce:11.7.12-ce.0` version of gitlab.
+
+To see a list of images, visit
+https://hub.docker.com/r/gitlab/gitlab-ce/tags
 
 If there is no web address to which the gitlab will be listening to, just remove the :code:`hostname` from the above. 
 
-You can find the ip address the container is running using
+The ip address where the container is running can be found using
 
 .. code-block:: bash
 
    docker network ls
    docker network inspect bridge
+
+and looking for the address of the specific container, typically something like :code:`172.17.x.x/xx`
+
+**Updating**
+
+To update to a newer version, run the above code again, replacing the 
+:code:`gitlab-ce:11.7.12-ce.0` part with the newest version, as found from 
+https://hub.docker.com/r/gitlab/gitlab-ce/tags
+
+Note that updates between different major versions, have to follow a specific schedule. For example for going from :code:`11.7.0` to :code:`13.3.4` the following schedule has to be followed
+
+:code:`11.7.12` ->
+:code:`11.11.8` ->
+:code:`12.0.12` ->
+:code:`12.10.14`->
+:code:`13.0.12` ->
+:code:`13.3.4`
+
+For more info visit 
+https://docs.gitlab.com/ee/policy/maintenance.html#upgrade-recommendations
+
+
+
 
 Backup
 ******
@@ -507,7 +525,7 @@ Once everything's in place, run the following...
     # Check GitLab, after the container is up and healty...
     docker exec -it <name of container> gitlab-rake gitlab:check SANITIZE=true
 
-* Note that gitlab appends a :code:`_gitlab_backup.tar` suffix to the argument of the :code:`BACKUP`. So, if the bakup file name is :code:`mybackup_gitlab_backup.tar`, the restore command should use :code:`BACKUP=mybackup` only.
+* Note that gitlab appends a :code:`_gitlab_backup.tar` suffix to the argument of the :code:`BACKUP`. So, if the backup file name is :code:`mybackup_gitlab_backup.tar`, the restore command should use :code:`BACKUP=mybackup` only.
 
 * Sometimes there can be a permissions issue with the backup file. In these cases do the following:
 
@@ -517,7 +535,41 @@ Once everything's in place, run the following...
     cd /var/opt/gitlab/backups
     chown git:git <name_of_the_back_up_file>
 
-Docker Runner
+SSH
+***
+
+**Enabling ssh to a different port**
+
+To enable ssh access to gitlab from a different port start the gitlab container using
+
+.. code-block:: bash
+
+    docker run ... \
+      ... \
+      --publish 6173:22 \
+      --env GITLAB_SHELL_SSH_PORT=6173 \
+      ... \
+The above exposes the port 22 (ssh) to the host's port 6173, and sets the environment variable :code:`GITLAB_SHELL_SSH_PORT` accordingly.
+
+**Permissions**
+
+When the ssh key files are copied during a restore, it is possible that the correct permissions, especially if the files have been to a windows environment. To restore permissions log in the gitlab container :code:`docker exec -it gitlab /bin/bash` and set the permissions of the , :code:`ssh_host_rsa_key`, :code:`ssh_host_ecdsa_key` and :code:`ssh_host_ed25519_key` to 600. i.e.
+
+.. code-block:: bash
+
+    docker exec -it gitlab /bin/bash
+    cd /etc/gitlab
+    chmod 600 ssh_host_rsa_key ssh_host_ecdsa_key ssh_host_ed25519_key
+
+**Troubleshooting**
+
+To check issues with ssh access the logs are in 
+:code:`/srv/gitlab/logs/sshd/current`
+
+
+
+
+Gitlab Runner
 *************
 
 Installation

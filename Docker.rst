@@ -86,83 +86,113 @@ Run a command in a running container. E.g. start a bash shell in a running conta
 Container management
 ********************
 
-Containers can be managed either with the :code:`docker` or the :code:`docker container` commands. Some examples are given below. 
+Containers can be managed either with the :code:`docker` or the :code:`docker container` commands. Some examples are given below.  :code:`<docker_id>` can either be the container's name or its hash tag. 
 
-* :code:`docker container ls`
+**List all running containers**
 
-   List all running containers
+.. code-block:: bash
 
-* :code:`docker container ls -aq` 
+    docker container ls
+        # -a show all containers, not just running
+        # -q only display numeric ids
 
-   List all containers, showing only the hashes
+**Create container**
 
-* :code:`docker create <docker_name>`
+Create a new container (syntax similar to docker run).
 
-   Create a new container (syntax similar to docker run).
+.. code-block:: bash
 
-* :code:`docker start <docker_id>`
+    docker create <docker_name>
 
-   Restart a non-running container 
+**Start a stopped container**
 
-* :code:`docker stop <docker_id>`
+.. code-block:: bash
 
-   Gracefully stop container
+    docker start <docker_id>
 
-* :code:`docker kill <docker_id>`
+**Restart a container**
 
-   Forcefully stop container
+.. code-block:: bash
 
-* :code:`docker rm <docker_id>`
+    docker restart <docker_id>
 
-   Remove specified container
+**Stop container**
+
+Gracefully stop container
+
+.. code-block:: bash
+
+    docker stop <docker_id>
+
+**Kill a container**
+
+Forcefully stop container
+
+.. code-block:: bash
+
+    docker kill <docker_id>
+
+**Remove specified container**
+
+.. code-block:: bash
+
+    docker rm <docker_id>
+
+**Remove all containers**
+
+.. code-block:: bash
+
+    docker rm $(docker container ls -a -q)
 
 
-:code:`<docker_id>` can either be the container's name or its hash tag. 
+**NUCLEAR: Remove everything**
 
+WARNING! This will remove:
 
-* :code:`docker rm $(docker container ls -a -q)`
+* all stopped containers
+* all networks not used by at least one container
+* all images without at least one container associated to them
+* all build cache
 
-   Remove all containers  
+.. code-block:: bash
 
-
-* :code:`docker system prune -a`
-
-   WARNING! This will remove:
-
-     * all stopped containers
-
-     * all networks not used by at least one container
-
-     * all images without at least one container associated to them
-
-     * all build cache
-
-
-
-
+    docker system prune -a
 
 Image management 
 *****************
 
 Images can be managed with the :code:`docker image` command. 
 
-Some examples.
+**List images**
 
-* :code:`docker image ls`
+.. code-block:: bash
 
-  * List images
+    docker image ls
+        # -a show all containers, not just running
+        # -q only display numeric ids
 
-* :code:`docker image ls -a`  
+**Remove images**
 
-  * List all images
+.. code-block:: bash
 
-* :code:`docker image rm <image_id>`
+    docker image rm <image_id>
 
-  * Remove image
+**Remove all images from this machine**
 
-* :code:`docker image rm $(docker image ls -aq)`
+.. code-block:: bash
 
-  * Remove all images from this machine
+    docker image rm $(docker image ls -aq)
+
+**Dangling images**
+
+Sometimes after building an image, some images are also created that have :code:`REPOSITORY` and :code:`TAG` :code:`<none>`. These are called *dangling* images. To find these images use the following
+
+.. code-block:: bash
+
+    docker images -f "dangling=true" 
+
+This will list all the dangling images which can then be deleted with :code:`docker image rm`. Note that the above command uses :code:`images` instead of :code:`image`.
+
 
 
 
@@ -186,7 +216,7 @@ Help on ps
 Networking
 **********
 
-List all docer networks
+List all docker networks
 
 .. code-block:: bash
 
@@ -211,11 +241,17 @@ https://www.digitalocean.com/community/tutorials/building-optimized-containers-f
 Various
 *******
 
+Log in
+======
+
 Log in this CLI session using your Docker credentials
 
 .. code-block:: bash
 
   docker login
+
+Tags
+====
 
 Tag :code:`<image>` for upload to registry
 
@@ -223,11 +259,15 @@ Tag :code:`<image>` for upload to registry
 
   docker tag <image> username/repository:tag
 
-Upload tagged image to registry
+Uploading tagged images to registry
+===================================
 
 .. code-block:: bash
 
   docker push username/repository:tag
+
+Prune 
+======
 
 Remove stopped containers and all of the images 
 
@@ -239,13 +279,25 @@ Remove stopped containers and all of the images
 
 A user-defined bridge network like this enables communication between containers on the same Docker daemon host. This streamlines traffic and communication within your application, since it opens all ports between containers on the same bridge network, while exposing no ports to the outside world. Thus, you can be selective about opening only the ports you need to expose your frontend services. 
 
-**Logs**
+Logs
+====
 
 Show the logs for a specific container (service)
 
 .. code-block:: bash
 
   docker-compose logs <service_name>
+
+Copy files 
+===========
+
+Copy files between a container and the local filesystem
+
+.. code-block:: bash
+
+   docker cp <container>:/path/to/file /path/to/local/directory
+
+
 
 
 Docker files
@@ -303,18 +355,138 @@ One way of updating a container using latest code is to rebuild the image, and r
 
 
 Docker registry
-*******************************
+***************
 
-**Get an image's digest:**
+Create and upload an image to a (local) registry
+================================================
+
+Get the base image
 
 .. code-block:: bash
 
-  curl -v -X GET <registry.ip.address>:<port>/v2/<image_name>/manifests/<image_tag> 2>&1 |grep Docker-Content-Digest | awk '{print($3)}'
+    docker pull ubuntu:16.04
 
-this is useful for uniquely identifying an image for e.g. deleting it.
+Tag it including the repository's address
+
+.. code-block:: bash
+
+    docker tag ubuntu:16.04 localhost:5000/my-ubuntu
+
+Alternatively, if you want to build the image from an existing Dockerfile, run
+
+.. code-block:: bash
+
+    docker build -t localhost:5000/my-ubuntu .
 
 
+Push it to the registry
 
+.. code-block:: bash
+
+    docker push localhost:5000/my-ubuntu
+
+Delete local copies
+
+.. code-block:: bash
+
+    docker image rm ubuntu:16.04
+    docker image rm localhost:5000/my-ubuntu
+
+Get it back from the registry
+
+.. code-block:: bash
+
+    docker pull localhost:5000/my-ubuntu
+
+Insecure registries
+===================
+
+If the registry is not secured with https, trying to push an image will return the following error
+
+.. code-block::
+
+    This push refers to repository [<server.name>:<port>/<name>]
+    Get https://<server.name>:<port>/v2: http: server gave HTTP response to HTTPS client
+
+If this happens, open :code:`/etc/docker/daemon.json` and add the line 
+
+.. code-block::
+
+    {"insecure-registries":["<server.name>:<port>"]}
+
+Then restart the docker service by 
+
+.. code-block:: bash
+
+    service docker restart
+
+Allowing deletes in a registry
+==============================
+
+A registry by default does not allow you to delete an image. To enable this functionality, open in the container that runs the registry the file :code:`/etc/docker/registry/config.yml` and add the the :code:`delete:enabled:true` as in the example below.
+
+.. code-block::
+   :emphasize-lines: 9,10
+
+    log:
+      fields:
+        service: registry
+    storage:
+        cache:
+            layerinfo: inmemory
+        filesystem:
+            rootdirectory: /var/lib/registry
+        delete:
+            enabled: true
+    http:
+        addr: :5000
+
+Afterwards, restart the container as
+
+.. code-block::
+
+    docker container restart <container_name>
+
+Deleting an image from the repository
+=====================================
+
+Get the image's digest 
+
+.. code-block::
+
+    curl -i -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+    <server.name>:port/v2/<repo_name>/manifests/<tag>  2>&1 \
+    | grep Docker-Content-Digest | awk '{print($2)}'
+
+This will return the digest in the form :code:`sha256:54b69....`.
+
+Note that the Header (:code:`-H`) part is necessary. If not, the digest returned is not the one that will allow us to delete the image. For more see (https://docs.docker.com/registry/spec/api/#deleting-an-image).
+
+Once the digest is obtained run the following to delete the image
+
+.. code-block::
+
+    curl -X DELETE <server.name>:<port>/v2/<repo_name>/manifests/`sha256:54b69....
+
+Get in the registry's container and run the garbage collector
+
+.. code-block::
+
+    /bin/registry garbage-collect /etc/docker/registry/config.yml
+
+
+Deleting the repository itself
+==============================
+
+It is possible to delete a repository after all its images have been deleted. Assuming that a repository has no images, get in the registry's container and run the following
+
+.. code-block::
+
+    /bin/registry garbage-collect /etc/docker/registry/config.yml
+    rm -r /var/lib/registry/docker/registry/v2/repositories/<name>
+
+The reference for the registry's api is 
+https://docs.docker.com/registry/spec/api/
 
 Docker installation on Centos 8
 *******************************
