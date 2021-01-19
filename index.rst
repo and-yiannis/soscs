@@ -28,10 +28,10 @@ Table of Contents
    ML.rst
    Nest.rst
    Python.rst
+   PyTorch.rst
    R.rst
    Tmux.rst
    Vim.rst
-..   PyTorch.rst
 
 Indices and tables
 ******************

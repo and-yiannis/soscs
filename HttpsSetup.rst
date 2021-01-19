@@ -121,3 +121,41 @@ Store the following code in the file `/etc/nginx/conf.d/ssl.<_Domain_Name_>.conf
 .. code-block:: bash
 
    acme.sh --upgrade
+
+
+Apache 
+#######
+Apache can be used as a reverse proxy a load balancer and a web server
+
+A web server is a software with a primary function to store, process and deliver web pages to clients.
+
+Useful tutorials: https://httpd.apache.org/docs/2.4/howto/
+
+Installation
+************
+
+Install on ubuntu
+
+.. code-block:: bash
+
+   sudo apt-get update && sudo apt-get upgrade
+   sudo apt-get install apache2
+   service apache2 status
+
+
+Enable and disable configurations/modules/sites
+*********************************
+
+The following commands enable and disable configurations, modules and sites, by adding or removing symlinks in the (conf-, mod-, site-)enabled directory respectively.
+
+.. code-block:: bash
+
+    a2enconf <conf-name>
+    a2disconf <conf-name>
+
+    a2enmod <mod-name>
+    a2dismod <mod-name>
+
+    a2ensite <site-name>
+    a2dissite <site-name>
+

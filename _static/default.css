@@ -506,4 +506,10 @@ ul.keywordmatches li.goodmatch a {
     font-weight: bold;
 }
 
+.rst-content .section ol p
+    margin-bottom: 0;
+}
 
+.rst-content .section ul p {
+    margin-bottom: 0;
+}
