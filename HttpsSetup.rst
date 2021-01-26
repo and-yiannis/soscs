@@ -121,3 +121,131 @@ Store the following code in the file `/etc/nginx/conf.d/ssl.<_Domain_Name_>.conf
 .. code-block:: bash
 
    acme.sh --upgrade
+
+Apache Web Server
+#################
+
+Can be used as a
+
+* Proxy server
+* Load Balancer
+* Web server
+
+Install and start
+
+.. code-block:: bash
+
+   sudo apt-get update && sudo apt-get upgrade
+   sudo apt-get install apache2
+   service apache2 status
+
+In Debian
+
+.. code-block:: bash
+
+   apt install apache2
+   systemctl status apache2.service
+
+The key folders and files in the apache configuration directory are
+
+.. code-block:: bash
+
+   # Files
+   apache2.conf # The configuration file
+   envvars
+   magic
+   ports-conf
+
+   # Directories
+   conf-available
+   conf-enabled
+   mods-available
+   mods-enabled
+   sites-available
+   sites-enabled
+
+:code:`a2ensite` enables a site. :code:`a2dissite` disables it.
+:code:`a2enmod` enables a module. :code:`a2dismod` disables it.
+:code:`apachectl configtest` checks if the configuration files are ok
+
+The above utilities are in :code:`/usr/sbin`
+
+
+
+Apache and php-fpm
+
+.. code-block:: bash
+
+    apt install php
+    apt install software-properties-common
+    wget -q https://packages.sury.org/php/apt.gpg -O- | sudo apt-key add -
+    echo "deb https://packages.sury.org/php/ stretch main" | sudo tee /etc/apt/sources.list.d/php.list
+    apt update
+    apt install php5.6
+    apt install php7.3
+    apt install php5.6-fpm
+    apt install php7.3-fpm
+    apt install libapache2-mod-fcgid php-fpm 
+
+To see the default php version
+
+.. code-block:: bash
+
+    php -v
+
+To change the default php version
+
+.. code-block:: bash
+
+    update-alternatives --set php /usr/bin/php5.6
+
+Start the fpm services
+
+.. code-block:: bash
+
+    systemctl start php5.6-fpm
+    systemctl start php7.3-fpm
+
+Check they're working
+
+.. code-block:: bash
+
+    systemctl status php5.6-fpm
+    systemctl status php7.3-fpm
+
+
+Enable modules
+
+.. code-block:: bash
+
+    sudo a2enmod actions fcgid alias proxy_fcgi
+    systemctl restart apache2
+
+Add the highlighed lines in the site's .conf file. 
+
+.. code-block:: bash
+    :emphasize-lines: 14-17
+
+    <VirtualHost *:80>
+         ServerAdmin admin@site2.your_domain
+         ServerName site2.your_domain
+         DocumentRoot /var/www/site2.your_domain
+         DirectoryIndex info.php
+    
+         <Directory /var/www/site2.your_domain>
+            Options Indexes FollowSymLinks MultiViews
+            AllowOverride All
+            Order allow,deny
+            allow from all
+         </Directory>
+    
+        <FilesMatch \.php$>
+          # For Apache version 2.4.10 and above, use SetHandler to run PHP as a fastCGI process server
+          SetHandler "proxy:unix:/run/php/php7.2-fpm.sock|fcgi://localhost"
+        </FilesMatch>
+    
+         ErrorLog ${APACHE_LOG_DIR}/site2.your_domain_error.log
+         CustomLog ${APACHE_LOG_DIR}/site2.your_domain_access.log combined
+    </VirtualHost>
+
+
