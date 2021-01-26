@@ -144,6 +144,12 @@ Forcefully stop container
 
     docker rm $(docker container ls -a -q)
 
+**Remove all images without an associated container**
+
+.. code-block:: bash
+
+    docker image prune -a
+
 
 **NUCLEAR: Remove everything**
 
@@ -297,6 +303,14 @@ Copy files between a container and the local filesystem
 
    docker cp <container>:/path/to/file /path/to/local/directory
 
+Save running containers as images
+=================================
+
+The following will save a running container as an image.
+
+.. code-block:: bash
+
+   docker commit <container_id> <image/name>
 
 
 

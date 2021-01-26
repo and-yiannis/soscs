@@ -549,6 +549,7 @@ To enable ssh access to gitlab from a different port start the gitlab container 
       --publish 6173:22 \
       --env GITLAB_SHELL_SSH_PORT=6173 \
       ... \
+
 The above exposes the port 22 (ssh) to the host's port 6173, and sets the environment variable :code:`GITLAB_SHELL_SSH_PORT` accordingly.
 
 **Permissions**
@@ -593,8 +594,8 @@ Get the docker image and start the runner.
 
 Things to watch: 
 
-* The :code:`gitlab-runner` tag (:code:`11.7.0` in the example above) should match the version of the gitlab installation. A list of tags can be found here: 
-https://hub.docker.com/r/gitlab/gitlab-runner/tags/
+* | The :code:`gitlab-runner` tag (:code:`11.7.0` in the example above) should match the version of the gitlab installation. A list of tags can be found here: 
+  | https://hub.docker.com/r/gitlab/gitlab-runner/tags/
 
 Registration
 ============
@@ -612,7 +613,7 @@ In the command line run
 
 .. code-block:: bash
 
-  docker run -it gitlab-runner gitlab-runner register
+  docker exec -it gitlab-runner gitlab-runner register
 
 The first :code:`gitlab-runner` is the name of the container and the second is a command to be executed within the container. 
 
@@ -649,7 +650,7 @@ Runners won't start unless the job has the same tag as the runner does.  For exa
 
 **Clone_url**
 
-In the :code:`config.toml` file, add the url of the gitlab installation in the :code:`[[runners]]` section. 
+In the :code:`/srv/gitlab-runner/config/config.toml` file, add the url of the gitlab installation in the :code:`[[runners]]` section. 
 
 .. code-block::
 
@@ -713,3 +714,96 @@ Linking runners to specific projects
 Going to :code:`Admin > Overview > Runners` and selecting a specific runner, allows linking a runner to a specific project, by selecting :code:`Enable` in the :code:`Restrict projects for this Runner`.
 
 This makes the specific runner not a shared runner any more, and can be only used to serve specific projects. **Note** This process is **non-reversible**. Once a runner stops being a shared runner by means of the above process, it cannot be a shared runner again. 
+
+
+SSH on Windows via cygwin
+#########################
+The following instructions allow the installation of a ssh host on a windows machine. The host is set up on cygwin. The instructions were based on https://gist.github.com/roxlu/5038729.
+
+1) Installing CYGWIN with SSH
+
+  * Download cygwin setup.exe from http://www.cygwin.com
+  * Execute setup.exe
+  * Install from internet
+  * Root directory: `c:\cygwin` + all users
+  * Local package directory: use default value
+  * Select a mirror to download files from
+  * | Select these packages:
+    | net > openssh 
+    | admin > cygrunsrv 
+  * Click continue
+   
+2) Configure SSHD
+
+  * open a cygwin terminal as administrator
+  * $ ssh-host-config
+  * Are you sure you want to continue: YES
+  * You have the required privileges: YES
+  * Overwrite existing /etc/ssh_config: YES
+  * Should privilege separation be used: YES
+  * Use local account 'sshd': YES
+  * Do you want to install 'sshd' as a service: YES
+  * name CYGWIN: just press enter
+  * Do you want to use a different name: no
+
+     
+3) Add the user to SSHD password
+
+  * $ cd /etc/
+  * $ cp passwd passwd_bak
+  * $ /bin/mkpasswd.exe -l -u <user_name> >> /etc/passwd 
+
+
+
+4) Open SSHD port (2222)
+
+  * Open control panel
+  * Click on System and Security
+  * Click on Windows Firewall
+  * On the left click on advanced settings
+
+    * click: select "Inbound Rules"
+    * click: New Rule ...
+
+      * | [x] Port
+        | NEXT
+      * | TCP 
+        | Specific ports: 2222
+        | NEXT
+      * | [x] Allow the connection
+        | NEXT
+      * | [x] Domain
+        | [x] Private
+        | [x] Public
+        | NEXT
+
+6) Trouble shooting
+
+ * first check if you can connect to the SSHD server on the same machine:
+
+   * open a Cygwin terminal
+   * $ ssh -l <user_name> localhost
+     
+   * If you can't connect to the server on localhost check if the sshd daemon is running (see below)
+
+   * check if the SSHD daemon is runing
+
+     * open control panel
+     * search for "services"
+     * click on "View local services" 
+     * search for "CYGWIN sshd"
+     * make sure it's there, else try reinstalling sshd 
+
+Notes:
+
+* To find the exact name of the user you should be ssh'ing with, type :code:`whoami` in the terminal. 
+
+* The configuration file for the ssh host is in :code:`/etc/sshd_config`. Within there you can change many things among:
+
+  * the :code:`Port` the daemon will be listening to
+  * :code:`PubkeyAuthentication`, to allow authentication using public keys.
+  * :code:`AuthorizedKeysFile`, to set the authorized keys file
+
+The :code:`/etc/sshd_config` file can only be changed when cygwin is started in Administration mode. After any changes are made, you should restart the service, as described above.
+
+

@@ -488,6 +488,25 @@ and once logged on to server1 we typed
 
 For this to happen without passwords, you'd need to have :code:`id_rsa` in :code:`~/.ssh` of the client machine and server1, and :code:`id_rsa.pub` to be copied in the :code:`~/.ssh/authorized_keys` of server1 and server2.
 
+Various
+=======
+
+* Generate the public key from the private key
+
+.. code-block:: bash
+
+    ssh-keygen -y -f </path/to/privatekey>
+
+* Get the server signature. 
+
+This is useful for placing in the :code:`known_hosts` file and avoid being asked for confirmation before connecting to a server for the first time. 
+
+.. code-block:: bash
+
+    ssh-keyscan -p <port> <server>
+
+
+
 Bash input arguments
 ********************
 

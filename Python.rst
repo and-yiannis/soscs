@@ -1828,14 +1828,63 @@ python -m line_profiler file_to_profile.py.lprof
 
 
 
-virtual environments
+Virtual environments
 ####################
+
+* In linux 
 
 .. code-block:: bash
 
     python -m venv env
 
     source env/bin/activate
+
+* In Windows with Anaconda 
+
+.. code-block:: bash
+
+    # Create an environment
+    conda create --name <name>
+
+    # Create environment from file
+    conda env create -f <filename.yml>
+
+    # Activate the environment
+    conda activate <name>
+
+    # Deactivate the environment
+    conda deactivate <name>
+
+    # List environments
+    conda env list
+
+    # Remove environment
+    conda remove --name <name> --all
+
+* In Windows, environments are created in :code:`C:\ProgramData\Anaconda3\envs`. It is possible to create them at a different location using the :code:`--prefix` flag of :code:`conda create`.
+* After an environment is deleted, an empty folder might be left in :code:`C:\ProgramData\Anaconda3\envs`, which can be removed manually. 
+* Packages can be added with :code:`conda install...` once the environment is activated, or by specifying them in the creation of the environment as 
+
+.. code-block:: bash
+
+    # Create virtual environment
+    conda create -n <name> numpy=1.16
+
+or in a :code:`yml` file as:
+
+.. code-block:: 
+
+    name: dash
+    dependencies:
+      - python
+      - pandas=1.18
+      - numpy
+
+
+Full instructions in https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html
+
+
+
 
 
 AWS cli
