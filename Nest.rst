@@ -1082,20 +1082,15 @@ https://itnext.io/javascript-promises-vs-rxjs-observables-de5309583ca2
 Construction phase:
 *******************
 
-A promise is an object that accepts a function as an argument.
-Let's call this function the :code:`executor`.
-The executor takes 2 arguments, the :code:`resolveExec` and the :code:`rejectExec`, both of
-which are functions.
-The executor function ends by calling either the :code:`resolveExec` or the :code:`rejectExec`
-functions. These functions can take 1 or more arguments.
+A promise is an object that is constructed with a single argument, which is a function that we call the :code:`executor`.  The executor takes two further functions as arguments, which we call :code:`resolve` and :code:`reject`. The executor function ends by calling either of the :code:`resolve` or :code:`reject` functions. The arguments of the latter functions are called :code:`resolveArg` and :code:`rejectArg` respectively.
 
 .. code-block:: javascript
 
-     myPromise = new Promise((resolveExec, rejectExec) => {
+     myPromise = new Promise((resolve, reject) => {
        if (successful) {
-         resolveExec(resolveArg);
+         resolve(resolveArg);
        } else {
-         rejectExec(rejectArg)
+         reject(rejectArg)
        }
      })
 
@@ -1105,20 +1100,20 @@ Usage phase
 A promise object is resolved (i.e. used) by invoking its :code:`then` member
 function.
 The :code:`then` function takes two functions as arguments.
-The first function is called if the :code:`resolveExec` function of the promise was called.
-The second function is called if the :code:`rejectExec` function of the promise was called.
-The arguments for the :code:`resolveExec` and :code:`rejectExec` are passed to the respective function
+The first function is called if the :code:`resolve` function of the promise was called.
+The second function is called if the :code:`reject` function of the promise was called.
+The arguments for the :code:`resolve` and :code:`reject` are passed to the respective function
 arguments of the :code:`then` function.
 
 .. code-block:: javascript
 
      myPromise.then(
-       // This will be called if the resolveExec was called in the promise
-       (argRes) => { // argRes is the same as the resolveArg in the promise
+       // This will be called if 'resolve' was called in the executor
+       (argRes) => { // argRes is the same as the resolveArg in the executor
         console.log(argRes);
        },
-       // This will be called if the rejectExec was called in the promise
-       (argRej) => { // argRej is the same as the rejectArg in the promise
+       // This will be called if 'reject' was called in the executor
+       (argRej) => { // argRej is the same as the rejectArg in the executor
         console.log(argRej);
        }
      )

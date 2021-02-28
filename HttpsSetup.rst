@@ -143,7 +143,7 @@ Install on ubuntu
    service apache2 status
 
 Enable and disable configurations/modules/sites
-*********************************
+***********************************************
 
 The following commands enable and disable configurations, modules and sites, by adding or removing symlinks in the (conf-, mod-, site-)enabled directory respectively.
 
