@@ -1831,15 +1831,48 @@ python -m line_profiler file_to_profile.py.lprof
 Virtual environments
 ####################
 
-* In linux 
+Linux 
+*****
 
 .. code-block:: bash
 
-    python -m venv env
+    # Create environment
+    python -m venv <env_name>
 
-    source env/bin/activate
+    # Activate
+    source <env_name>/bin/activate
 
-* In Windows with Anaconda 
+    # Upgrade pip
+    python -m pip install --upgrade pip
+
+    # Install requirements
+    python -m pip install -r requirements.txt
+
+    # Deactivate
+    deactivate
+
+Windows
+*******
+
+.. code-block:: bash
+
+    # Create environment
+    python -m venv <env_name>
+
+    # Activate
+    .\<env_name>\Scripts\activate
+
+    # Upgrade pip
+    python -m pip install --upgrade pip
+
+    # Install requirements
+    python -m pip install -r requirements.txt
+
+    # Deactivate
+    deactivate
+
+Windows with Anaconda 
+**********************
 
 .. code-block:: bash
 
@@ -1861,7 +1894,7 @@ Virtual environments
     # Remove environment
     conda remove --name <name> --all
 
-* In Windows, environments are created in :code:`C:\ProgramData\Anaconda3\envs`. It is possible to create them at a different location using the :code:`--prefix` flag of :code:`conda create`.
+* The environments are created in :code:`C:\ProgramData\Anaconda3\envs`. It is possible to create them at a different location using the :code:`--prefix` flag of :code:`conda create`.
 * After an environment is deleted, an empty folder might be left in :code:`C:\ProgramData\Anaconda3\envs`, which can be removed manually. 
 * Packages can be added with :code:`conda install...` once the environment is activated, or by specifying them in the creation of the environment as 
 
@@ -1882,8 +1915,6 @@ or in a :code:`yml` file as:
 
 
 Full instructions in https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html
-
-
 
 
 
