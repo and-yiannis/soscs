@@ -278,4 +278,55 @@ Add the highlighed lines in the site's .conf file.
          CustomLog ${APACHE_LOG_DIR}/site2.your_domain_access.log combined
     </VirtualHost>
 
+https://www.sitepoint.com/how-to-install-apache-on-windows/
+***********************************************************
 
+* Make sure none is listening on port 80 (IIS)
+* Download Microsoft Visual C++2015 Redistributable
+    https://www.microsoft.com/en-us/download/details.aspx?id=48145
+* Download Apache
+    www.apachelounge.com/download
+* Extract the Apache2x directory in the location you want to install the webserver. (C:\Apache24)
+* in the conf/httpd.conf file:
+    * (ln 37) Set the server root in `Define SRVROOT`
+    * (ln 60) listen to all requests on port 80 `Listen *:80`
+    * (ln 162) `LoadModule rewrite_module modules/modrewrite.so`
+    * (ln 227) `ServerName localhost:80`
+    * (ln 224) `AllowOverride All` for allowing `.htaccess` overrides.
+    * (ln 251) Set the root `DocumentRoot "D:/WebPages"`
+    * (ln 252) Set the root `<Directory "D:/WebPages">`
+* Test the installation
+    * Run in `Apache24/bin` directory
+        `httpd -t`
+* Install as windows service 
+    * Run in `Apache24/bin` directory
+        `httpd -k install` 
+
+https://www.sitepoint.com/how-to-install-php-on-windows/
+********************************************************
+
+Download the thread save php (zip)
+Extract it in e.g. `C:\php`
+Add the directory to the windows' path
+Copy php.ini-development to php.ini and uncomment the following:
+    extension=curl
+    extension=gd
+    extension=mbstring
+    extension=pdo_mysql
+* Configure php as an apache module by adding at the end of the 
+  apache httpd.conf file the following
+  `PHPIniDir "C:/php"
+   LoadModule php7_module "C:/php/php7apache2_4.dll"
+   Addtype application/x-httpd-php .php`
+* Check the httpd.conf file
+   `Apache24/bin/httpd -t` 
+* Restart apache
+* Test php (`localhost/index.php`) with `index.php` being
+    `<?php
+    phpinfo();
+    ?>`
+
+
+    * 
+
+* Open the conf/httpd.conf

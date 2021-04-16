@@ -1730,31 +1730,39 @@ and find and uncomment the line
 c.TerminalInteractiveShell.editing_mode = 'vi'
 
 
-Encoding Decoding
-#################
+Byte Encoding Decoding
+######################
 
 
+A string can be turned into bytes with :code:`s.encode()`
 
-A string s can be turned into bytes with s.encode()
-    >s = 'hello'
-    >s
-      'hello'
-    >b = s.encode()
-    >b
-      b'hello'
+.. code-block:: python
 
-A bytes object can be turned to a string with b
-    >b.decode()
-      'hello'
+    > s = 'hello'
+    > b = s.encode()
+    > b
+       b'hello'
 
-A string can be turned to a list of integers with list(b)
-    >list(b)
-      [104, 101, 108, 108, 111]
+A byte object can be turned to a string with :code:`b.decode()`
 
-A list of integers can be turned to bytes with bytes(l)
-    >bytes([104, 101, 108, 108, 111])
-      b'hello'
+.. code-block:: python
 
+    > b.decode()
+       'hello'
+
+A byte object can be represented as integers in the 0-255 range by converting it to a list
+
+.. code-block:: python
+
+    > list(b)
+       [104, 101, 108, 108, 111]
+
+A list of integers can be turned to bytes with :code:`bytes()`
+
+.. code-block:: python
+
+    > bytes([104, 101, 108, 108, 111])
+       b'hello'
 
 
 Bitwise operations 
@@ -1916,6 +1924,25 @@ or in a :code:`yml` file as:
 
 Full instructions in https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html
 
+Visual Studio Code integration
+##############################
+To use a specific interpreter, add in the :code:`settings.json` (either the project's one or the global) the following line (for a windows env):
+
+.. code-block:: 
+
+    "python.pythonPath": "C:\\path\\to\\env\\Scripts\\python.exe"
+
+For easy debugging, add a launch.json configuration as follows:
+
+.. code-block:: 
+
+        {
+          "name": "Python: Current File",
+          "type": "python",
+          "request": "launch",
+          "program": "${file}",
+          "console": "integratedTerminal"
+        }
 
 
 AWS cli
