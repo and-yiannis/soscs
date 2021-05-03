@@ -22,7 +22,6 @@ Table of Contents
    DebianSetup.rst
    Docker.rst
    Git.rst
-   HttpsSetup.rst
    MongoDB.rst
    MySQL.rst
    ML.rst
@@ -32,6 +31,8 @@ Table of Contents
    R.rst
    Tmux.rst
    Vim.rst
+   WebServers.rst
+   Win.rst
 
 Indices and tables
 ******************

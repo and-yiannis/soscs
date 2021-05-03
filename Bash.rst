@@ -605,5 +605,24 @@ In the :code:`nameserver` part, you can use a different DNS server instead of of
 
 You can use for example the DNS server of the windows machine that runs wsl. This can be found by running :code:`ipconfig /all` in a cmd window. It can also be found by running :code:`nslookup` in a cmd window as well. 
 
+Enable ping on Debian in wsl2
+*****************************
 
+.. code-block:: 
 
+    sudo setcap cap_net_raw+p /bin/ping
+
+From https://github.com/microsoft/WSL/issues/5109
+
+Mount volumes from WSL2
+***********************
+
+The following mounts Windows drive :code:`D:` to :code:`/mnt/d`.
+
+.. code-block:: 
+
+    #Mount
+    sudo mkdir -p /mnt/d
+    mount -t drvfs D: /mnt/d
+    # Unmount
+    umount /mnt/d
