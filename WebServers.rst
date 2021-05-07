@@ -347,6 +347,7 @@ Setting up PHP
     extension_dir = "C:\PHP\5.4\ext"
 
 for version 5.4, etc.
+
 * Open the Windows Environment Variables and append the :code:`PATH` variable with the names of the php version folders, e.g. :code:`C:\PHP\5.4;C:\PHP\7.4` etc
 
 To test that the php versions are working, open a command terminal in each PHP folder and run

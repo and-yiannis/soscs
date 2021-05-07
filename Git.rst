@@ -393,6 +393,22 @@ These configurations can be changed from the :code:`.gitconfig` file as well.
 
 For windows, the respective options are :code:`<wincred>` and :code:`<manager>`. The first uses the windows credentials and the second uses the credential manager. 
 
+.gitignore
+##########
+**Rules**
+
+* If there is a separator (:code:`/`) at the beginning, middle or both of the pattern, then the pattern is **relative** to the directory level of the particular :code:`.gitignore`. Otherwise, the pattern may also match at any level below the :code:`.gitignore` level.
+* A separator at the end of the pattern matches only directories, otherwise, the pattern can match both files and directories.
+
+**Examples**
+
+* :code:`foo` will match either a file or a directory named :code:`foo` **anywhere** in the repo.
+* :code:`foo/` will match only a **directory** named :code:`foo` anywhere in the repo.
+* :code:`**/foo` will match either a file or a directory named :code:`foo` anywhere in the repo, the same as :code:`foo`
+* :code:`foo/**` will match everything inside the directory :code:`foo`, **relative** to the location of the :code:`.gitignore` path. I.e. it will match the contents of the directory :code:`foo` which is located at the same level as the :code:`.gitignore` file but not the contents of the directory :code:`bar/foo`.
+* Similarly, :code:`doc/frotz/` matches :code:`doc/frotz/` but not :code:`a/doc/frotz/`, whereas :code:`frotz/` matches both :code:`frotz/` and :code:`doc/frotz/`.
+* :code:`a/**/b` will match :code:`a/b`, :code:`a/x/b`, :code:`a/x/y/b` etc
+
 Gitlab setup 
 ############
 
