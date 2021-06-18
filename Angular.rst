@@ -264,6 +264,11 @@ A property is a variable inside a component class.
 **Method**
 A method is a function inside a component class.
 
+A propery is declared as public when it's going to be binded to (used in) the template.
+
+* Components have to be imported in the :code:`app.module.ts` and be declared in the :code:`declarations section` of the :code:`@NgModule` decorator of the :code:`app.module.ts`.
+
+* Services are not declared anywhere, but in their :code:`Injectable` decorator, the state they are :code:`providedIn` :code:`root`.
 
 NPM stuff
 #########

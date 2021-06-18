@@ -4,13 +4,44 @@ Win
 
 PIDs, Ports, Services
 #####################
-To see the services Run :code:`services.msc`
 
-To see what's listening on each port Run :code:`resmon.exe`, go to the Network Tab, and check the Listening Ports.
+1) Which process is listening on a port?
+****************************************
+The Visual way:
+===============
 
-To see the PID of a service open the task manager and go to the Services tab.
+Run :code:`resmon.exe`, go to the Network Tab, and check the Listening Ports. Within there you can find the port and the PID of the process that's listening.
 
-To see the executable for a given PID, open the task manager and go to the Details tab.
+The Command line way
+====================
+
+Run in a powershell
+
+.. code-block:: bash
+
+    netstat -ano | findstr "portNo"
+
+The last number that will pop up is the PID
+
+2) Which service started the listening process?
+***********************************************
+To find this we need to find the parent process of the PID that's listening in the port. This can be done with the powershell command
+
+.. code-block:: bash
+
+    wmic process get processid,parentprocessid | findstr "PID"
+
+The first number that will pop up is the PID of the service. 
+
+3) Find Service based on PID
+****************************
+* Open the Task Manager, and go to the Services tab and find the service by PID. 
+* Right click and press 'Open Services'
+* Find the service in the Services, right click and press Properties.
+
+From there it should be easy to find details about the service.
+
+
 
 nssm
 ####
