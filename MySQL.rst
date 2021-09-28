@@ -544,6 +544,27 @@ query as:
         ) r2
   WHERE country_rank <= 2;
 
+Find Foreign keys
+=================
+
+The following snippet will return for all the foreign keys in the database, the column name and the table they belong to, and the column name and table they are referencing. 
+
+.. code-block:: sql
+
+    SELECT
+       f.name as FKName,
+       OBJECT_NAME(f.parent_object_id) FKTable,
+       COL_NAME(fc.parent_object_id,fc.parent_column_id) FKColumn,
+       OBJECT_NAME(f.referenced_object_id) ReferencedTable,
+       COL_NAME(fc.referenced_object_id,fc.referenced_column_id) ReferencedCol
+    FROM 
+       sys.foreign_keys AS f
+    INNER JOIN 
+       sys.foreign_key_columns AS fc 
+          ON f.OBJECT_ID = fc.constraint_object_id
+    WHERE 
+       OBJECT_NAME(f.parent_object_id) = 'Table_Name';
+
 
 Change root password
 ====================

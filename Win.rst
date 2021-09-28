@@ -25,13 +25,15 @@ The last number that will pop up is the PID
 
 2) Which service started the listening process?
 ***********************************************
-To find this we need to find the parent process of the PID that's listening in the port. This can be done with the powershell command
+To find this we need to find the parent process of the PID that's listening in the port. This can be done with the command
 
 .. code-block:: bash
 
     wmic process get processid,parentprocessid | findstr "PID"
 
 The first number that will pop up is the PID of the service. 
+
+Note: This command can only be executed from the **command prompt** and **not** from the *powershell*.
 
 3) Find Service based on PID
 ****************************

@@ -1821,18 +1821,23 @@ line profiler
 #############
 
 
-git clone https://github.com/rkern/line_profiler.git
-python setup.py build
-python setup.py install
+* git clone https://github.com/rkern/line_profiler.git
+* python setup.py build
+* python setup.py install
 
-Decorate the function you want to profile with
-@profile
+* Decorate the function you want to profile with :code:`@profile`
 
-run the profiler with 
-kernprof -l file_to_profile.py
+* run the profiler with
+
+.. code-block:: python
+
+    kernprof -l file_to_profile.py`
 
 Print the results with 
-python -m line_profiler file_to_profile.py.lprof 
+
+.. code-block:: python
+
+    python -m line_profiler file_to_profile.py.lprof 
 
 
 

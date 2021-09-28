@@ -1279,6 +1279,46 @@ We can also create sleep functions...
 Observables 
 ############
 
+Definitions
+***********
+
+* **Observable**
+
+.. code-block:: javascript
+
+    import { Observable } from 'rxjs';
+
+    observable = new Observable(subscriberFunction)
+
+* **subscriberFunction**
+
+.. code-block:: javascript
+
+    subscriberFunction = (subscriber) => {
+        subscriber.next(..),
+        subscriber.error(..)
+        subscriber.complete()
+    }
+
+
+* **Subscription**
+
+.. code-block:: javascript
+
+    subscription = observable.subscribe(observer);
+
+* **observer**
+
+.. code-block:: javascript
+
+    observer = {
+        next: (x) => {...},
+        error: (x) => {...},
+        complete: () => {...},
+    }
+
+
+
 The following material is taken from 
 https://itnext.io/javascript-promises-vs-rxjs-observables-de5309583ca2
 

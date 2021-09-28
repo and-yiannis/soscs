@@ -273,29 +273,84 @@ Apache on Windows
 Installing Apache on Windows
 ****************************
 
+Installation 
+=============
+
 https://www.sitepoint.com/how-to-install-apache-on-windows/
 
-* Make sure none is listening on port 80 (IIS)
-* Download Microsoft Visual C++2015 Redistributable from https://www.microsoft.com/en-us/download/details.aspx?id=48145
+* Make sure no one is listening on port 80 (IIS)
+* Visit www.apachelounge.com/download
+* As per the instructions, download Visual Studio C++ 2019 aka VS16 from the link found in the page, (https://aka.ms/vs/16/release/VC_redist.x64.exe) and install
 * Download Apache from www.apachelounge.com/download
-* Extract the Apache2x directory in the location you want to install the webserver. (:code:`C:\Apache24`)
-* Edit the conf/httpd.conf file as follows:
+* Extract the Apache2x directory in the location you want to install the webserver. 
 
-    * (ln 37) Set the server root in `Define SRVROOT`
-    * (ln 60) listen to all requests on port 80 `Listen *:80`
-    * (ln 162) `LoadModule rewrite_module modules/modrewrite.so`
-    * (ln 227) `ServerName localhost:80`
-    * (ln 224) `AllowOverride All` for allowing `.htaccess` overrides.
-    * (ln 251) Set the root `DocumentRoot "D:/WebPages"`
-    * (ln 252) Set the root `<Directory "D:/WebPages">`
+Setting up 
+==========
+
+Do the following changes in the :code:`conf/httpd.conf` file.
+
+* (ln 37) Set the directory where the server is installed in :code:`Define SRVROOT`. 
+* (ln 60) Set the listening port(s) e.g. :code:`Listen *:80`
+* (ln 227) Set the servername e.g. :code:`ServerName localhost:80`
+* (ln 162) Enable the rewrite module :code:`LoadModule rewrite_module modules/modrewrite.so`
+* (ln 251) Set the default directory out of which all docs are server e.g. :code:`DocumentRoot "D:/WebPages"`
+* Set options for the default directory
+
+    * (ln 252) Enter the default directory's name e.g. :code:`<Directory "D:/WebPages">`
+    * (ln 265) Change :code:`Options Indexes FollowSymLinks` to :code:`Options FollowSymLinks` to stop the server from listing files.
+    * (ln 277) Change to :code:`Require all denied`, so that content is denied by default and is served explicitly in directories and virtual hosts.
+
+Security Considerations
+=======================
+
+**Default Deny policy for root**
+
+No one should have access to the server's root folder. That's ensured with the (default) directives found in :code:`httpd.conf`
+
+.. code-block:: 
+
+    <Directory />
+       AllowOverride none
+       Require all denied
+    </Directory>
+
+**AllowOverride None**
+
+Set :code:`AllowOverride None` everywhere in :code:`httpd.conf`, so that :code:`.htaccess` files can't modify the server's behaviour. This can be enabled, where and when needed.
+
+**Disable public access to .htfiles**
+
+Prevent :code:`htaccess` and :code:`.htpasswd` files from being viewed by Web clients.
+
+.. code-block:: 
+
+   <Files ".ht*">
+       Require all denied
+   </Files>
+
+
+**ServerSignature Off**
+
+This is a default choice that stops the server from displaying information about it (version, etc).
+
+
+Testing and starting the server
+===============================
+
 * Test the installation by running :code:`./httpd.exe -t` in the :code:`Apache24/bin` directory.
-* Install as windows service by running :code:`./httpd.exe -k install` in the :code:`Apache24/bin` directory.
+* Start the server locally for testing by running :code:`./httpd.exe`.
+* Install as windows service by running :code:`./httpd.exe -k install`. 
 
+
+
+
+
+Installing a single PHP on windows
+**********************************
 
 https://www.sitepoint.com/how-to-install-php-on-windows/
-********************************************************
 
-* Download the thread save php (zip)
+* Download the thread safe php (zip)
 * Extract it in e.g. `C:\php`
 * Add the directory to the windows' path
 * Copy php.ini-development to php.ini and uncomment the following:
@@ -334,6 +389,7 @@ This tutorial is based on https://www.dionysopoulos.me/apache-mysql-php-server-o
 
 Setting up PHP
 ==============
+* Make sure that the correct version of the Microsoft Visual C++ Redistributable for Visual Studio is installed for the version of the PHP that is being installed.
 * Download the PHP versions you want from http://windows.php.net/download. Choose the Non Thread Safe releases.
 * Create a folder to store the PHPs, e.g. :code:`C:\PHP`. 
 * Make one folder for each php within there, e.g. :code:`C:\PHP\5.4`, :code:`C:\PHP\7.4` etc
@@ -343,12 +399,17 @@ Setting up PHP
 .. code-block:: php
 
     ; extension_dir="ext"
-    ; to
+
+    to
+
     extension_dir = "C:\PHP\5.4\ext"
 
 for version 5.4, etc.
 
 * Open the Windows Environment Variables and append the :code:`PATH` variable with the names of the php version folders, e.g. :code:`C:\PHP\5.4;C:\PHP\7.4` etc
+
+
+* If there is an environment variable called :code:`PHPRC`, php will use the :code:`php.ini` file found in that folder. To use a different :code:`php.ini` file when testing from the command line, export the path to the correct :code:`php.ini` file to the :code:`PHPRC` variable. See also the "Different php.ini files per php version". 
 
 To test that the php versions are working, open a command terminal in each PHP folder and run
 
@@ -362,7 +423,7 @@ Setting up Apache
 =================
 * Install Apache following the instructions in the **Installing Apache on Windows** section, up to the point where we test the installation.
 * Download the the :code:`mod_fcgid` module from https://www.apachelounge.com/download/, extract its contents and move the :code:`mod_fcgid.so` file in the :code:`C:\Apache24\modules` folder.
-* Edit the :code:`C:\Apache24\conf\extra\httpd-default.conf` adding the following lines at the end
+* Edit the :code:`C:\Apache24\conf\extra\httpd-fcgid.conf` (or create it) adding the following lines at the end
 
 .. code-block::
 
@@ -389,15 +450,21 @@ Setting up Apache
 
 The :code:`c:/php/5.4` in  :code:`FcgidInitialEnv PATH`,  :code:`FcgidInitialEnv PHPRC` and  :code:`FcgidWrapper` above, represents the default php version, which can be changed accordingly.
 
-* Edit the :code:`C:\Apache24\conf\httpd.conf` removing the leading :code:`#`.
+* Uncomment the following in :code:`C:\Apache24\conf\httpd.conf` (removing the leading :code:`#`).
 
 .. code-block::
 
     # LoadModule include_module modules/mod_include.so
     # LoadModule fcgid_module modules/mod_fcgid.so
     # LoadModule vhost_alias_module modules/mod_vhost_alias.so
-    ...
-    # Include conf/extra/httpd-default.conf
+
+* Add the following in :code:`C:\Apache24\conf\httpd.conf` somewhere close to the rest of the :code:`IfModule` s (e.g. after the :code:`<IfModule cgi`).
+
+.. code-block::
+
+    <IfModule fcgid_module>
+        Include conf/extra/httpd-fcgid.conf
+    </IfModule>
 
 * Now test and start the Apache as indicated in the **Installing Apache on Windows** section.
 * Add in the :code:`DocumentRoot` directory defined above, a file named :code:`phpinfo.php` with the content
@@ -529,3 +596,36 @@ The first is by adding the appropriate :code:`Directory` directives in the virtu
 will give PHP version 5.5 in folder http://localhost/55 and version 7.4 in folder folder http://localhost/74
 
 The second method is by placing the :code:`Files` directive that's in the :code:`Directory` directive in the :code:`.htaccess` file of each folder. 
+
+Different php.ini files per php version
+---------------------------------------
+
+The above setting will result in all phps being initialised with the same :code:`php.ini` file, which will be the one described in :code:`FcgidInitialEnv PHPRC "..."` in the :code:`httpd-fcgid.conf` file.
+
+To use a different :code:`php.ini` file per php version (recommended), each php version has to have its own virtual host. For each virtual host, add the :code:`FcgidInitialEnv PHPRC "..."` directive indicating the location of the respective :code:`php.ini` file, e.g. 
+
+.. code-block:: 
+
+    # PHP 5.6 virtual host (local56.web)
+    <VirtualHost *:80>
+      FcgidInitialEnv PHPRC "c:/php/5.6/"
+      <Files ~ "\.php$">
+        AddHandler fcgid-script .php
+        FcgidWrapper "c:/php/5.6/php-cgi.exe" .php
+        Options +ExecCGI
+        Require all granted
+      </Files>
+    </VirtualHost>
+    
+    # PHP 5.7 virtual host (local57.web)
+    <VirtualHost *:81>
+      FcgidInitialEnv PHPRC "c:/php/5.7/"
+      <Files ~ "\.php$">
+        AddHandler fcgid-script .php
+        FcgidWrapper "c:/php/5.7/php-cgi.exe" .php
+        Options +ExecCGI
+        Require all granted
+      </Files>
+    </VirtualHost>
+
+
