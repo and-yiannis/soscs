@@ -55,49 +55,42 @@ Git
 Docker
 ******
 
-Run all the following as superuser.
+Run the following to install docker on debian. Run all the commands as superuser (sudo).
 
 .. code-block:: bash
 
     apt-get remove docker docker-engine docker.io containerd runc
-
-.. code-block:: bash
-
     apt-get install apt-transport-https ca-certificates curl gnupg2 software-properties-common
-
-.. code-block:: bash
-
-    curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
-
-.. code-block:: bash
-
+    curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
     add-apt-repository \
        "deb [arch=amd64] https://download.docker.com/linux/debian \
-       $(lsb_release -cs) \
-       stable"
-
-.. code-block:: bash
-
+       $(lsb_release -cs) stable"
     apt-get update
-
-.. code-block:: bash
-
     apt-get install docker-ce docker-ce-cli containerd.io
 
-Info available in:
-`<https://docs.docker.com/install/linux/docker-ce/debian/>`_
+
+To install on ubuntu, change the 2 instances of `debian` in the above with `ubuntu`.
+
 
 To make docker available to :code:`user`, run
 
 .. code-block:: bash
 
   groupadd docker
-
-.. code-block:: bash
-
   usermod -aG docker user
 
 and restart the VM.
+
+To test run 
+
+.. code-block:: bash
+
+  docker run hello-world
+
+
+Info available in:
+`<https://docs.docker.com/install/linux/docker-ce/debian/>`_
+
 
 
 Docker compose

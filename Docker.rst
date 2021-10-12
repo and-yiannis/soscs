@@ -13,7 +13,7 @@ General
   docker info
 
 Build
-*****
+=====
 
 Build an image from a Dockerfile
 
@@ -34,7 +34,7 @@ Create an image tagged `debian` using the current directory's Dockerfile
   docker build -t debian .
 
 Run
-***
+===
 
 Run a command in a *new* container.
 
@@ -69,9 +69,8 @@ Start interactively a new container from the image named `debian` exposing ports
   docker container run -it -p 80:80 -p 443:443 -v /home:/app debian /bin/bash
 
 
-
 Exec
-****
+====
 
 Run a command in a running container. E.g. start a bash shell in a running container:
 
@@ -82,6 +81,21 @@ Run a command in a running container. E.g. start a bash shell in a running conta
 * :code:`-i` : interactive
 * :code:`-t` : opens a tty connection
 
+
+Ps
+==
+
+List containers 
+
+.. code-block:: bash
+
+  docker ps
+
+Help on ps
+
+.. code-block:: bash
+
+  docker ps --help
 
 Container management
 ********************
@@ -116,17 +130,13 @@ Create a new container (syntax similar to docker run).
 
     docker restart <docker_id>
 
-**Stop container**
-
-Gracefully stop container
+**Stop container (Gracefully)** 
 
 .. code-block:: bash
 
     docker stop <docker_id>
 
-**Kill a container**
-
-Forcefully stop container
+**Kill a container (Forcefully)**
 
 .. code-block:: bash
 
@@ -204,20 +214,6 @@ This will list all the dangling images which can then be deleted with :code:`doc
 
 
 
-Ps
-**
-
-List containers 
-
-.. code-block:: bash
-
-  docker ps
-
-Help on ps
-
-.. code-block:: bash
-
-  docker ps --help
 
 Networking
 **********
@@ -272,14 +268,6 @@ Uploading tagged images to registry
 
   docker push username/repository:tag
 
-Prune 
-======
-
-Remove stopped containers and all of the images 
-
-.. code-block:: bash
-
-  docker system prune -a
 
 **User-defined bridge networks**
 
@@ -311,6 +299,18 @@ The following will save a running container as an image.
 .. code-block:: bash
 
    docker commit <container_id> <image/name>
+
+
+Rebuild images:
+===============
+
+One way of updating a container using latest code is to rebuild the image, and restart the containers. This can be done using
+
+.. code-block:: bash
+
+  docker-compose build --no-cache <service-name>
+  docker-compose down
+  docker-compose up
 
 
 
@@ -349,23 +349,6 @@ Run the docker compose file
 
   * Run in a detached mode
 
-
-More info
-*********
-
-`<https://docs.docker.com/install/linux/docker-ce/debian/>`_
-
-
-Rebuild images:
--------------------
-
-One way of updating a container using latest code is to rebuild the image, and restart the containers. This can be done using
-
-.. code-block:: bash
-
-  docker-compose build --no-cache <service-name>
-  docker-compose down
-  docker-compose up
 
 
 Docker registry
@@ -502,6 +485,100 @@ It is possible to delete a repository after all its images have been deleted. As
 The reference for the registry's api is 
 https://docs.docker.com/registry/spec/api/
 
+Docker Swarm 
+*************
+
+**Start the swarm**
+
+.. code-block::
+
+  docker swarm init --advertise-addr 10.30.209.104
+
+**Get the token for adding worker nodes**
+
+.. code-block::
+
+  docker swarm join-token worker
+
+**Run this on a node to add a worker**
+
+.. code-block::
+
+  docker swarm join --token SWMTKN-1-2hl7ey6h7ruoh6gwtgml9fx0d3ztdjz7khknmpodof0uqlr0iz-0k6gm3wi5i7gbmtfwuncbosui 10.30.209.104:2377
+
+**Info**
+
+.. code-block::
+
+  docker info
+  docker node ls
+  docker node inspect --pretty <node_name>
+
+
+**Start a Service**
+
+.. code-block::
+
+   docker service create --replicas 1 --name helloworld alpine ping docker.com
+
+**List services**
+
+.. code-block::
+
+  docker service ls
+
+**Inspect service**
+
+.. code-block::
+
+  docker service inspect --pretty <service_name>
+
+**See where the service is running**
+
+.. code-block::
+
+  docker service ps <service_name>
+
+**Scale service**
+
+.. code-block::
+
+  docker service scale <service_name>=5
+
+This can be used to scale the service up or down.
+
+**Remove service**
+
+.. code-block::
+
+  docker service rm <service_name>
+
+**Update a service**
+
+.. code-block::
+
+  docker service create \
+    --replicas 3 \
+    --name redis \
+    --update-delay 10s \
+    redis:3.0.6
+  docker service update --image redis:3.0.7 redis
+
+**Take a node offline**
+
+.. code-block::
+
+   docker node update --availability drain <node_name>
+
+**Bring it back up again**
+
+.. code-block::
+
+   docker node update --availability active <node_name>
+
+
+
+
 Docker installation on Centos 8
 *******************************
 
@@ -553,6 +630,57 @@ It's worth checking the latest docker compose release in https://github.com/dock
 
 Instructions taken from 
 https://www.linuxtechi.com/install-docker-ce-centos-8-rhel-8/
+
+Docker installation on Debian/Ubuntu
+************************************
+
+Run the following to install docker on debian. Run all the commands as superuser (sudo).
+
+.. code-block:: bash
+
+    apt-get remove docker docker-engine docker.io containerd runc
+    apt-get install apt-transport-https ca-certificates curl gnupg2 software-properties-common
+    curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+    add-apt-repository \
+       "deb [arch=amd64] https://download.docker.com/linux/debian \
+       $(lsb_release -cs) stable"
+    apt-get update
+    apt-get install docker-ce docker-ce-cli containerd.io
+
+
+To install on ubuntu, change the 2 instances of `debian` in the above with `ubuntu`.
+
+
+To make docker available to :code:`user`, run
+
+.. code-block:: bash
+
+  groupadd docker
+  usermod -aG docker user
+
+and restart the VM.
+
+To test run 
+
+.. code-block:: bash
+
+  docker run hello-world
+
+
+Info available in:
+`<https://docs.docker.com/install/linux/docker-ce/debian/>`_
+
+
+**docker-compose installation**
+
+.. code-block:: bash
+
+    curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+.. code-block:: bash
+
+    sudo chmod +x /usr/local/bin/docker-compose
+
 
 
 
