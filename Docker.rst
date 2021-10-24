@@ -240,6 +240,164 @@ For file copying instructions like `COPY` and `ADD`, Docker compares the checksu
 
 https://www.digitalocean.com/community/tutorials/building-optimized-containers-for-kubernetes#managing-container-layers
 
+Docker-compose
+**************
+
+Build, (re)create, start, and attach to containers for a service.
+
+.. code-block:: bash
+
+   docker-compose up -d
+
+Start a specific service inside a docker-compose file
+
+.. code-block:: bash
+
+   docker-compose up -d <service_name>
+
+Scale instances
+
+.. code-block:: bash
+
+   docker-compose up -d --scale <service_name>=2
+
+
+Stop containers and remove volumes (:code:`-v`) containers, networks, and images (:code:`--rmi 'all'`) created by :code:`up`.
+
+.. code-block:: bash
+
+   docker-compose down -v --rmi 'all'
+
+
+Reference: https://docs.docker.com/compose/reference/
+
+
+Docker Swarm 
+*************
+
+Swarm management
+================
+
+**Start the swarm**
+
+.. code-block::
+
+  docker swarm init --advertise-addr 10.30.209.104
+
+**Get the token for adding worker nodes**
+
+.. code-block::
+
+  docker swarm join-token worker
+
+**Run this on a node to add a worker**
+
+.. code-block::
+
+  docker swarm join --token SWMTKN-1-2hl7ey6h7ruoh6gwtgml9fx0d3ztdjz7khknmpodof0uqlr0iz-0k6gm3wi5i7gbmtfwuncbosui 10.30.209.104:2377
+
+**Info**
+
+.. code-block::
+
+  docker info
+  docker node ls
+  docker node inspect --pretty <node_name>
+
+
+Extract a specific info (like node id), from the list returned by :code:`docker info`.
+
+.. code-block::
+
+   docker info -f '{{.Swarm.NodeID}}'
+
+
+
+
+**Take a node offline**
+
+
+.. code-block::
+
+   docker node update --availability drain <node_name>
+
+**Bring it back up again**
+
+.. code-block::
+
+   docker node update --availability active <node_name>
+
+
+Services
+========
+
+.. code-block::
+
+   # Start
+   docker service create \
+     --name helloworld \
+     --replicas 1  
+     --publish published=5000,target=5000 \
+     alpine ping docker.com
+
+   # List
+   docker service ls
+
+   #Inspect
+   docker service inspect --pretty <service_name>
+
+   # See where the service is running
+   docker service ps <service_name>
+
+   # Scale (can be used to scale the service up or down)
+   docker service scale <service_name>=5
+
+   # Remove
+   docker service rm <service_name>
+
+   # Update
+   docker service create \
+     --replicas 3 \
+     --name redis \
+     --update-delay 10s \
+     redis:3.0.6
+   docker service update --image redis:3.0.7 redis
+
+
+   # Create a local registry service
+   docker service create --name registry --publish published=5000,target=5000 registry:2
+
+   # Push image to the registry
+   docker-compose push
+
+
+
+
+
+Docker Stack
+============
+
+A stack has many services, as described in the docker-compose file
+
+.. code-block:: bash
+
+   # Start
+   docker stack deploy --compose-file docker-compose.yml <name_of_the_stack>
+
+   # List stacks
+   docker stack ls 
+
+   # List the services in a stack
+   docker stack services <name_of_the_stack>
+
+   # List the tasks in the stack (inc. see where the services are running)
+   docker stack ps <name_of_the_stack>
+
+   # Remove
+   docker stack rm <name_of_the_stack>
+
+
+
 Various
 *******
 
@@ -333,21 +491,6 @@ Expose port 80, the container will listen to that
 .. code-block:: bash
 
   EXPOSE 80
-
-
-
-Docker compose
-**************
-
-Run the docker compose file
-
-.. code-block:: bash
-
-  docker-compose up 
-
-* :code:`-d` 
-
-  * Run in a detached mode
 
 
 
@@ -484,100 +627,6 @@ It is possible to delete a repository after all its images have been deleted. As
 
 The reference for the registry's api is 
 https://docs.docker.com/registry/spec/api/
-
-Docker Swarm 
-*************
-
-**Start the swarm**
-
-.. code-block::
-
-  docker swarm init --advertise-addr 10.30.209.104
-
-**Get the token for adding worker nodes**
-
-.. code-block::
-
-  docker swarm join-token worker
-
-**Run this on a node to add a worker**
-
-.. code-block::
-
-  docker swarm join --token SWMTKN-1-2hl7ey6h7ruoh6gwtgml9fx0d3ztdjz7khknmpodof0uqlr0iz-0k6gm3wi5i7gbmtfwuncbosui 10.30.209.104:2377
-
-**Info**
-
-.. code-block::
-
-  docker info
-  docker node ls
-  docker node inspect --pretty <node_name>
-
-
-**Start a Service**
-
-.. code-block::
-
-   docker service create --replicas 1 --name helloworld alpine ping docker.com
-
-**List services**
-
-.. code-block::
-
-  docker service ls
-
-**Inspect service**
-
-.. code-block::
-
-  docker service inspect --pretty <service_name>
-
-**See where the service is running**
-
-.. code-block::
-
-  docker service ps <service_name>
-
-**Scale service**
-
-.. code-block::
-
-  docker service scale <service_name>=5
-
-This can be used to scale the service up or down.
-
-**Remove service**
-
-.. code-block::
-
-  docker service rm <service_name>
-
-**Update a service**
-
-.. code-block::
-
-  docker service create \
-    --replicas 3 \
-    --name redis \
-    --update-delay 10s \
-    redis:3.0.6
-  docker service update --image redis:3.0.7 redis
-
-**Take a node offline**
-
-.. code-block::
-
-   docker node update --availability drain <node_name>
-
-**Bring it back up again**
-
-.. code-block::
-
-   docker node update --availability active <node_name>
-
-
-
 
 Docker installation on Centos 8
 *******************************
