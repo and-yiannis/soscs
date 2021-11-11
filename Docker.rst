@@ -82,21 +82,6 @@ Run a command in a running container. E.g. start a bash shell in a running conta
 * :code:`-t` : opens a tty connection
 
 
-Ps
-==
-
-List containers 
-
-.. code-block:: bash
-
-  docker ps
-
-Help on ps
-
-.. code-block:: bash
-
-  docker ps --help
-
 Container management
 ********************
 
@@ -109,6 +94,9 @@ Containers can be managed either with the :code:`docker` or the :code:`docker co
     docker container ls
         # -a show all containers, not just running
         # -q only display numeric ids
+
+:code:`docker ps` is an alias for :code:`docker ls`
+
 
 **Create container**
 
@@ -154,26 +142,6 @@ Create a new container (syntax similar to docker run).
 
     docker rm $(docker container ls -a -q)
 
-**Remove all images without an associated container**
-
-.. code-block:: bash
-
-    docker image prune -a
-
-
-**NUCLEAR: Remove everything**
-
-WARNING! This will remove:
-
-* all stopped containers
-* all networks not used by at least one container
-* all images without at least one container associated to them
-* all build cache
-
-.. code-block:: bash
-
-    docker system prune -a
-
 Image management 
 *****************
 
@@ -199,6 +167,12 @@ Images can be managed with the :code:`docker image` command.
 
     docker image rm $(docker image ls -aq)
 
+**Remove all images without an associated container**
+
+.. code-block:: bash
+
+    docker image prune -a
+
 **Dangling images**
 
 Sometimes after building an image, some images are also created that have :code:`REPOSITORY` and :code:`TAG` :code:`<none>`. These are called *dangling* images. To find these images use the following
@@ -209,36 +183,80 @@ Sometimes after building an image, some images are also created that have :code:
 
 This will list all the dangling images which can then be deleted with :code:`docker image rm`. Note that the above command uses :code:`images` instead of :code:`image`.
 
+**NUCLEAR: Remove everything**
 
+WARNING! This will remove:
 
-
-
-
-
-Networking
-**********
-
-List all docker networks
+* all stopped containers
+* all networks not used by at least one container
+* all images without at least one container associated to them
+* all build cache
 
 .. code-block:: bash
 
-    docker network ls
-
-Inspect the network :code:`<network_name>`. The name can be found from the :code:`ls` command.
-
-.. code-block:: bash
-
-    docker inspect <network_name> 
+    docker system prune -a
 
 
-Image layers and Build Cache
-****************************
+**Image layers and Build Cache**
 
 Docker creates a new image layer each time it executes a `RUN`, `COPY` or `ADD` instruction. If you build the image again, the build engine will check each instruction to see if it has an image layer cached for the operation. If it finds a match in the cache, it uses the existing image layer rather than executing the instruction again and rebuilding the layer. 
 
 For file copying instructions like `COPY` and `ADD`, Docker compares the checksums of the files to see if the operation needs to be performed again. 
 
 https://www.digitalocean.com/community/tutorials/building-optimized-containers-for-kubernetes#managing-container-layers
+
+Networking
+**********
+
+**List** all docker networks
+
+.. code-block:: bash
+
+    docker network ls
+
+**Inspect** the network :code:`<network_name>`. The name can be found from the :code:`ls` command.
+
+.. code-block:: bash
+
+    docker inspect <network_name> 
+
+**Create**
+
+.. code-block:: bash
+
+    docker network create --driver=overlay --attachable <network_name>
+
+*Options*
+
+* :code:`--driver` can be either :code:`overlay` or :code:`bridge`. Overlay allows the network to be shared between different nodes. 
+* :code:`--attachable` enable manual container attachement
+
+**Remove**
+
+.. code-block:: bash
+
+    docker network rm <network_name>
+
+Docker files
+************
+Start image
+
+.. code-block:: bash
+
+  FROM
+
+Copy the source destination (from the hard drive) to the docker.
+
+.. code-block:: bash
+
+  COPY src dest
+
+Expose port 80, the container will listen to that
+
+.. code-block:: bash
+
+  EXPOSE 80
+
 
 Docker-compose
 **************
@@ -268,8 +286,77 @@ Stop containers and remove volumes (:code:`-v`) containers, networks, and images
 
    docker-compose down -v --rmi 'all'
 
+Push image to the registry
+
+.. code-block:: bash
+
+   docker-compose push
 
 Reference: https://docs.docker.com/compose/reference/
+
+Services
+********
+
+**Start**
+
+.. code-block::
+
+   docker service create \
+     --name helloworld \
+     --replicas 1  
+     --publish published=5000,target=5000 \
+     alpine ping docker.com
+
+**List**
+
+.. code-block::
+
+   docker service ls
+
+**Inspect**
+
+.. code-block::
+
+   docker service inspect --pretty <service_name>
+
+**See where the service is running**
+
+.. code-block::
+
+   docker service ps <service_name>
+
+**Scale (can be used to scale the service up or down)**
+
+.. code-block::
+
+   docker service scale <service_name>=5
+
+**Remove**
+
+.. code-block::
+
+   docker service rm <service_name>
+
+**Update**
+
+.. code-block::
+
+   docker service create \
+     --replicas 3 \
+     --name redis \
+     --update-delay 10s \
+     redis:3.0.6
+   docker service update --image redis:3.0.7 redis
+
+
+**Create a local registry service**
+
+.. code-block::
+
+   docker service create --name registry --publish published=5000,target=5000 registry:2
+
+   # Push image to the registry
+   docker-compose push
 
 
 Docker Swarm 
@@ -296,6 +383,9 @@ Swarm management
 
   docker swarm join --token SWMTKN-1-2hl7ey6h7ruoh6gwtgml9fx0d3ztdjz7khknmpodof0uqlr0iz-0k6gm3wi5i7gbmtfwuncbosui 10.30.209.104:2377
 
+Nodes
+=====
+
 **Info**
 
 .. code-block::
@@ -310,12 +400,9 @@ Extract a specific info (like node id), from the list returned by :code:`docker 
 .. code-block::
 
    docker info -f '{{.Swarm.NodeID}}'
-
-
-
+   docker info -f '{{.Name}}'
 
 **Take a node offline**
-
 
 .. code-block::
 
@@ -327,51 +414,17 @@ Extract a specific info (like node id), from the list returned by :code:`docker 
 
    docker node update --availability active <node_name>
 
-
-Services
-========
+**Add label to a node**
 
 .. code-block::
 
-   # Start
-   docker service create \
-     --name helloworld \
-     --replicas 1  
-     --publish published=5000,target=5000 \
-     alpine ping docker.com
+   docker node update --label-add <label_name>=<value> <node_id>|<node_name>
 
-   # List
-   docker service ls
+**View node labels**
 
-   #Inspect
-   docker service inspect --pretty <service_name>
+.. code-block::
 
-   # See where the service is running
-   docker service ps <service_name>
-
-   # Scale (can be used to scale the service up or down)
-   docker service scale <service_name>=5
-
-   # Remove
-   docker service rm <service_name>
-
-   # Update
-   docker service create \
-     --replicas 3 \
-     --name redis \
-     --update-delay 10s \
-     redis:3.0.6
-   docker service update --image redis:3.0.7 redis
-
-
-   # Create a local registry service
-   docker service create --name registry --publish published=5000,target=5000 registry:2
-
-   # Push image to the registry
-   docker-compose push
-
-
-
+   docker node inspect <node_id>|<node_name> -f '{{.Spec.Labels}}'
 
 
 Docker Stack
@@ -379,24 +432,39 @@ Docker Stack
 
 A stack has many services, as described in the docker-compose file
 
+**Start**
+
 .. code-block:: bash
 
-   # Start
    docker stack deploy --compose-file docker-compose.yml <name_of_the_stack>
 
-   # List stacks
+**List stacks**
+
+.. code-block:: bash
+
    docker stack ls 
 
-   # List the services in a stack
+**List the services in a stack**
+
+.. code-block:: bash
+
    docker stack services <name_of_the_stack>
 
-   # List the tasks in the stack (inc. see where the services are running)
+**List the tasks in the stack (inc. see where the services are running)**
+
+.. code-block:: bash
+
    docker stack ps <name_of_the_stack>
 
-   # Remove
+**Remove**
+
+.. code-block:: bash
+
    docker stack rm <name_of_the_stack>
 
+**Points:**
 
+* The :code:`build` commands of docker-compose files are ignored when deploying services with a stack. The images that will be deployed with the stack must be prebuilt and stored in a repoistory
 
 Various
 *******
@@ -472,28 +540,6 @@ One way of updating a container using latest code is to rebuild the image, and r
 
 
 
-Docker files
-************
-Start image
-
-.. code-block:: bash
-
-  FROM
-
-Copy the source destination (from the hard drive) to the docker.
-
-.. code-block:: bash
-
-  COPY src dest
-
-Expose port 80, the container will listen to that
-
-.. code-block:: bash
-
-  EXPOSE 80
-
-
-
 Docker registry
 ***************
 
@@ -524,6 +570,12 @@ Push it to the registry
 .. code-block:: bash
 
     docker push localhost:5000/my-ubuntu
+
+List images in the registry
+
+.. code-block:: bash
+
+    curl -X GET http://localhost:5000/v2/_catalog
 
 Delete local copies
 
