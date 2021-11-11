@@ -292,6 +292,21 @@ Push image to the registry
 
    docker-compose push
 
+Logs: Show the logs for a specific container (service)
+
+.. code-block:: bash
+
+  docker-compose logs <service_name>
+
+Rebuild images: One way of updating a container using latest code is to rebuild the image, and restart the containers. This can be done using
+
+.. code-block:: bash
+
+  docker-compose build --no-cache <service-name>
+  docker-compose down
+  docker-compose up
+
+
 Reference: https://docs.docker.com/compose/reference/
 
 Services
@@ -499,15 +514,6 @@ Uploading tagged images to registry
 
 A user-defined bridge network like this enables communication between containers on the same Docker daemon host. This streamlines traffic and communication within your application, since it opens all ports between containers on the same bridge network, while exposing no ports to the outside world. Thus, you can be selective about opening only the ports you need to expose your frontend services. 
 
-Logs
-====
-
-Show the logs for a specific container (service)
-
-.. code-block:: bash
-
-  docker-compose logs <service_name>
-
 Copy files 
 ===========
 
@@ -527,16 +533,25 @@ The following will save a running container as an image.
    docker commit <container_id> <image/name>
 
 
-Rebuild images:
-===============
-
-One way of updating a container using latest code is to rebuild the image, and restart the containers. This can be done using
+Docker files
+************
+Start image
 
 .. code-block:: bash
 
-  docker-compose build --no-cache <service-name>
-  docker-compose down
-  docker-compose up
+  FROM
+
+Copy the source destination (from the hard drive) to the docker.
+
+.. code-block:: bash
+
+  COPY src dest
+
+Expose port 80, the container will listen to that
+
+.. code-block:: bash
+
+  EXPOSE 80
 
 
 
