@@ -629,3 +629,215 @@ To use a different :code:`php.ini` file per php version (recommended), each php 
     </VirtualHost>
 
 
+
+Traefik
+#######
+
+.. code-block:: yaml
+
+   #Reference: https://docs.docker.com/compose/compose-file/compose-file-v3/
+   
+   version: "3.9"
+   
+   networks:
+     net-1:
+       driver: overlay 
+       attachable: true
+     ext-web: # a network defined outside this .yml file
+       external: true 
+   
+   services:
+   
+     traefik:
+       command:
+         ## API Settings - https://docs.traefik.io/operations/api/, endpoints - https://docs.traefik.io/operations/api/#endpoints ##
+         - --api
+         - --api.insecure=true # <== Enabling insecure api, NOT RECOMMENDED FOR PRODUCTION
+         - --api.dashboard=true # <== Enabling the dashboard to view services, middlewares, routers, etc...
+         - --api.debug=true # <== Enabling additional endpoints for debugging and profiling
+   
+         ## Entrypoints Settings - https://docs.traefik.io/routing/entrypoints/#configuration ##
+         - --entrypoints.web.address=:80
+         - --entrypoints.web.http.redirections.entryPoint.to=websecure
+         - --entrypoints.web.http.redirections.entryPoint.scheme=https
+         - --entrypoints.websecure.address=:443
+   
+         ## Certificate Settings (Let's Encrypt) -  https://docs.traefik.io/https/acme/#configuration-examples ##
+         - --certificatesresolvers.mytlschallenge.acme.tlschallenge=true # <== Enable TLS-ALPN-01 to generate and renew ACME certs
+         - --certificatesresolvers.le.acme.email=${EMAIL?Variable not set} # <== Setting email for certs
+         - --certificatesresolvers.mytlschallenge.acme.storage=/letsencrypt/acme.json # <== Defining acme file to store cert information
+   
+         ## Log Settings https://docs.traefik.io/observability/logs/ - options: ERROR, DEBUG, PANIC, FATAL, WARN, INFO) ##(
+         - --log.level=DEBUG # <== Setting the level of the logs from traefik
+         # Enable the access log, with HTTP requests
+         - --accesslog
+   
+         ## Provider Settings - https://docs.traefik.io/providers/docker/#provider-configuration ##
+         - --providers.docker=true # <== Enabling docker as the provider for traefik
+         - --providers.file.watch=true
+         - --providers.docker.network=web # <== Operate on the docker network named web
+         - --providers.docker.swarmMode=true # <== Enable Docker Swarm mode
+         - --providers.file.filename=/dynamic.yaml # <== Referring to a dynamic configuration file
+         - --providers.docker.exposedbydefault=false # <== Don't expose every container to traefik, only expose enabled ones
+         - --providers.docker.constraints=Label(`traefik.constraint-label`, `traefik-public`) # <== Add a constraint to only use services with the label "traefik.constraint-label=traefik-public"
+   
+   
+       container_name: traefik
+   
+       env_file:
+         - .env
+   
+       deploy:
+         mode: global
+         placement:
+           constraints:
+             - node.role == manager
+             # Make the traefik service run only on the node with this label
+             # as the node with it has the volume for the certificates
+             - node.labels.traefik-public.traefik-public-certificates == true
+   
+       environment:
+         - TZ=Europe/Berlin
+   
+       image: traefik:v2.5
+   
+       labels:
+         # Enable traefik on itself to view dashboard and assign subdomain to view it
+         - traefik.enable=true 
+         # Use the traefik-public network (declared below)
+         - traefik.docker.network=traefik-public
+         # Use the custom label "traefik.constraint-label=traefik-public"
+         # This public Traefik will only use services with this label
+         # That way you can add other internal Traefik instances per stack if needed
+         - traefik.constraint-label=traefik-public
+         # admin-auth middleware with HTTP Basic auth
+         # Using the environment variables USERNAME and HASHED_PASSWORD
+         - traefik.http.middlewares.admin-auth.basicauth.users=${USERNAME?Variable not set}:${HASHED_PASSWORD?Variable not set}
+         # https-redirect middleware to redirect HTTP to HTTPS
+         # It can be re-used by other stacks in other Docker Compose files
+         - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+         - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+         # traefik-http set up only to use the middleware to redirect to https
+         # Uses the environment variable DOMAIN
+         - traefik.http.routers.traefik-public-http.rule=Host(`${DOMAIN?Variable not set}`)
+         - traefik.http.routers.traefik-public-http.entrypoints=http
+         - traefik.http.routers.traefik-public-http.middlewares=https-redirect
+         # traefik-https the actual router using HTTPS
+         # Uses the environment variable DOMAIN
+         - traefik.http.routers.traefik-public-https.rule=Host(`${DOMAIN?Variable not set}`)
+         - traefik.http.routers.traefik-public-https.entrypoints=https
+         - traefik.http.routers.traefik-public-https.tls=true
+         # Use the special Traefik service api@internal with the web UI/Dashboard
+         - traefik.http.routers.traefik-public-https.service=api@internal
+         # Use the "le" (Let's Encrypt) resolver created below
+         - traefik.http.routers.traefik-public-https.tls.certresolver=le
+         # Enable HTTP Basic auth, using the middleware created above
+         - traefik.http.routers.traefik-public-https.middlewares=admin-auth
+         # Define the port inside of the Docker service to use
+         # Setting the domain for the dashboard
+         - traefik.http.routers.api.rule=Host(`monitor.example.com`) 
+         # Enabling the api to be a service to access
+         - traefik.http.routers.api.service=api@internal 
+   
+       networks:
+         - traefik-public
+   
+       ports:
+         - "80:80" # <== http
+         - "8080:8080" # <== :8080 is where the dashboard runs on
+         - "443:443" # <== https
+   
+       restart: always
+   
+       volumes:
+         # Add Docker as a mounted volume, so that Traefik can read the labels of other services
+         - /var/run/docker.sock:/var/run/docker.sock:ro
+         # Mount the volume to store the certificates
+         - traefik-public-certificates:/certificates
+   
+   
+     #### For the app containers
+     whoami:
+       build: /path/to/DockerFile
+       container_name: "simple-service"
+       env_file:
+         - ./path/to/.envfile
+       environment:
+         VAR1: var1_value
+       image: 
+         traefik/whoami
+       labels: # Labels set on the container only, not on the service
+         - traefik.enable=true # <== Enable traefik to proxy this container
+         - traefik.http.routers.web.rule=Host(`example.com`) # <== Your Domain Name goes here for the http rule
+         - traefik.http.routers.web.entrypoints=web # <== Defining the entrypoint for http, **ref: line 30
+         - traefik.http.routers.web.middlewares=redirect@file # <== This is a middleware to redirect to https
+         - traefik.http.routers.websecure.rule=Host(`example.com`) # <== Your Domain Name for the https rule 
+         - traefik.http.routers.websecure.entrypoints=websecure # <== Defining entrypoint for https, **ref: line 31
+         - traefik.http.routers.websecure.tls.certresolver=mytlschallenge # <== Defining certsresolvers for https
+       networks:
+         - web
+       restart: always
+       volumes:
+         - wordpress:/var/www/html
+       deploy:
+         replicas:
+           1
+         placement:
+           constraints:
+             - node.labels.mylabel==true # Will only run on nodes with this label
+         labels: # These labels are set only on the service and not on any containers for this service
+           - traefik.http.services.service_name.loadbalancer.server.port=8001 # Port via which the traefik load balancer will talk to this container
+   
+   
+   
+   networks:
+     web:
+       external: true # For joining preexisting networks
+     backend:
+       external: false
+   
+       
+   volumes:
+     # Create a volume to store the certificates, there is a constraint to make sure
+     # Traefik is always deployed to the same Docker node with the same volume containing
+     # the HTTPS certificates
+     traefik-public-certificates:
+   
+   tls:
+       certificates:
+         - certFile: /data/traefik/certs/wildcard.crt
+           keyFile: /data/traefik/certs/wildcard.key
+         - certFile: /data/traefik/certs/another-wildcard.crt
+           keyFile: /data/traefik/certs/another-wildcard.key
+   
+       stores:
+           default:
+           defaultCertificate:
+               certFile: /data/traefik/certs/wildcard.crt
+               keyFile: /data/traefik/certs/wildcard.key
+   
+   
+   # Differences in deployment with docker-compose (local) and docker stack (distributed)
+   # 1) In the 'local' version the labels must be under the <service>, i.e. they should
+   #    be attached to the container. In the distributed version, the labels should be 
+   #    under the 'deploy:', i.e. attached to the service
+   # 2) In the 'local' version the - --providers.docker.swarmMode should be set to false 
+   #    or be commented out
+   
+   
+   # Start manually a web-app with its domain name
+   docker service create \
+   --replicas 15 \
+   --name web-app \
+   --constraint node.role!=manager \
+   --network proxy \
+   --label  traefik.enable=true \
+   --label 'traefik.http.routers.traefik.rule=Host(`app.doma.in`)' \
+   --label  traefik.http.routers.traefik.entrypoints=websecure \
+   --label  traefik.http.routers.traefik.tls=true \
+   --label  traefik.http.services.hostname.loadbalancer.server.port=80 \
+   nginxdemos/hello
+   
+   # Call address with host
+   curl -H Host:whoami.docker.localhost http://127.0.0.1
+   

@@ -142,6 +142,12 @@ Create a new container (syntax similar to docker run).
 
     docker rm $(docker container ls -a -q)
 
+**Logs**: See the logs for a container
+
+.. code-block:: bash
+
+    docker logs <container_name>
+
 Image management 
 *****************
 
@@ -237,68 +243,56 @@ Networking
 
     docker network rm <network_name>
 
-Docker files
-************
-Start image
-
-.. code-block:: bash
-
-  FROM
-
-Copy the source destination (from the hard drive) to the docker.
-
-.. code-block:: bash
-
-  COPY src dest
-
-Expose port 80, the container will listen to that
-
-.. code-block:: bash
-
-  EXPOSE 80
-
-
 Docker-compose
 **************
 
-Build, (re)create, start, and attach to containers for a service.
+https://docs.docker.com/compose/compose-file/compose-file-v3/
+
+
+**Build**, (re)create, start, and attach to containers for a service.
 
 .. code-block:: bash
 
    docker-compose up -d
 
-Start a specific service inside a docker-compose file
+**Build a specific service**
+
+.. code-block:: bash
+
+   docker-compose build <service_name>
+
+**Start a specific service** inside a docker-compose file
 
 .. code-block:: bash
 
    docker-compose up -d <service_name>
 
-Scale instances
+**Scale instances**
 
 .. code-block:: bash
 
    docker-compose up -d --scale <service_name>=2
 
 
-Stop containers and remove volumes (:code:`-v`) containers, networks, and images (:code:`--rmi 'all'`) created by :code:`up`.
+**Stop containers** and remove volumes (:code:`-v`) containers, networks, and images (:code:`--rmi 'all'`) created by :code:`up`.
 
 .. code-block:: bash
 
    docker-compose down -v --rmi 'all'
 
-Push image to the registry
+**Push image to the registry**
 
 .. code-block:: bash
 
    docker-compose push
 
-Logs: Show the logs for a specific container (service)
+**Logs**: Show the logs for a specific container (service)
 
 .. code-block:: bash
 
   docker-compose logs <service_name>
 
-Rebuild images: One way of updating a container using latest code is to rebuild the image, and restart the containers. This can be done using
+**Rebuild images**: One way of updating a container using latest code is to rebuild the image, and restart the containers. This can be done using
 
 .. code-block:: bash
 
@@ -362,16 +356,6 @@ Services
      --update-delay 10s \
      redis:3.0.6
    docker service update --image redis:3.0.7 redis
-
-
-**Create a local registry service**
-
-.. code-block::
-
-   docker service create --name registry --publish published=5000,target=5000 registry:2
-
-   # Push image to the registry
-   docker-compose push
 
 
 Docker Swarm 
@@ -477,83 +461,49 @@ A stack has many services, as described in the docker-compose file
 
    docker stack rm <name_of_the_stack>
 
+**Private registry authorisation**
+
+.. code-block:: bash
+
+   docker stack deploy --compose-file docker-compose.yml --with-registry-auth <name_of_the_stack>
+
+in case this complains, delete the local cache images with docker rmi
+
+
 **Points:**
 
-* The :code:`build` commands of docker-compose files are ignored when deploying services with a stack. The images that will be deployed with the stack must be prebuilt and stored in a repoistory
-
-Various
-*******
-
-Log in
-======
-
-Log in this CLI session using your Docker credentials
-
-.. code-block:: bash
-
-  docker login
-
-Tags
-====
-
-Tag :code:`<image>` for upload to registry
-
-.. code-block:: bash
-
-  docker tag <image> username/repository:tag
-
-Uploading tagged images to registry
-===================================
-
-.. code-block:: bash
-
-  docker push username/repository:tag
-
-
-**User-defined bridge networks**
-
-A user-defined bridge network like this enables communication between containers on the same Docker daemon host. This streamlines traffic and communication within your application, since it opens all ports between containers on the same bridge network, while exposing no ports to the outside world. Thus, you can be selective about opening only the ports you need to expose your frontend services. 
-
-Copy files 
-===========
-
-Copy files between a container and the local filesystem
-
-.. code-block:: bash
-
-   docker cp <container>:/path/to/file /path/to/local/directory
-
-Save running containers as images
-=================================
-
-The following will save a running container as an image.
-
-.. code-block:: bash
-
-   docker commit <container_id> <image/name>
-
+* The commands :code:`build`, :code:`container_name`, :code:`restart` and a few others are ignored with :code:`docker stack deploy` and are only supported with :code:`docker-compose up` and :code:`docker-compose run`. The images that will be deployed with the stack must be prebuilt and stored in a repoistory
 
 Docker files
 ************
 Start image
 
-.. code-block:: bash
+.. code-block:: docker
 
   FROM
 
 Copy the source destination (from the hard drive) to the docker.
 
-.. code-block:: bash
+.. code-block:: docker
 
   COPY src dest
 
 Expose port 80, the container will listen to that
 
-.. code-block:: bash
+.. code-block:: docker
 
   EXPOSE 80
 
+Create a python image, copying the local dir to :code:`code` and running the command :code:`python app.py`.
 
+.. code-block:: docker
+
+   FROM python:3.9-alpine
+   ADD . /code
+   WORKDIR /code
+   RUN pip install --upgrade pip
+   RUN pip install -r requirements.txt
+   CMD ["python", "app.py"]
 
 Docker registry
 ***************
@@ -604,6 +554,21 @@ Get it back from the registry
 .. code-block:: bash
 
     docker pull localhost:5000/my-ubuntu
+
+Create a local registry 
+========================
+
+.. code-block:: bash
+
+   docker service create \
+    --name registry \
+     --publish published=5000,target=5000 \
+     --env REGISTRY_STORAGE_DELETE_ENABLED=true \
+      registry:2
+
+The :code:`REGISTRY_STORAGE_DELETE_ENABLED=true` allows deletes in the registry by default 
+
+
 
 Insecure registries
 ===================
@@ -694,6 +659,59 @@ It is possible to delete a repository after all its images have been deleted. As
 
 The reference for the registry's api is 
 https://docs.docker.com/registry/spec/api/
+
+
+Various
+*******
+
+Log in
+======
+
+Log in this CLI session using your Docker credentials
+
+.. code-block:: bash
+
+  docker login
+
+Tags
+====
+
+Tag :code:`<image>` for upload to registry
+
+.. code-block:: bash
+
+  docker tag <image> username/repository:tag
+
+Uploading tagged images to registry
+===================================
+
+.. code-block:: bash
+
+  docker push username/repository:tag
+
+
+**User-defined bridge networks**
+
+A user-defined bridge network like this enables communication between containers on the same Docker daemon host. This streamlines traffic and communication within your application, since it opens all ports between containers on the same bridge network, while exposing no ports to the outside world. Thus, you can be selective about opening only the ports you need to expose your frontend services. 
+
+Copy files 
+===========
+
+Copy files between a container and the local filesystem
+
+.. code-block:: bash
+
+   docker cp <container>:/path/to/file /path/to/local/directory
+
+Save running containers as images
+=================================
+
+The following will save a running container as an image.
+
+.. code-block:: bash
+
+   docker commit <container_id> <image/name>
+
 
 Docker installation on Centos 8
 *******************************
@@ -796,10 +814,4 @@ Info available in:
 .. code-block:: bash
 
     sudo chmod +x /usr/local/bin/docker-compose
-
-
-
-
-
-
 
