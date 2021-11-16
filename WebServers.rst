@@ -769,10 +769,10 @@ Traefik
        labels: # Labels set on the container only, not on the service
          - traefik.enable=true # <== Enable traefik to proxy this container
          - traefik.http.routers.web.rule=Host(`example.com`) # <== Your Domain Name goes here for the http rule
-         - traefik.http.routers.web.entrypoints=web # <== Defining the entrypoint for http, **ref: line 30
+         - traefik.http.routers.web.entrypoints=web # <== Defining the entrypoint for http, ref: line 30
          - traefik.http.routers.web.middlewares=redirect@file # <== This is a middleware to redirect to https
          - traefik.http.routers.websecure.rule=Host(`example.com`) # <== Your Domain Name for the https rule 
-         - traefik.http.routers.websecure.entrypoints=websecure # <== Defining entrypoint for https, **ref: line 31
+         - traefik.http.routers.websecure.entrypoints=websecure # <== Defining entrypoint for https, ref: line 31
          - traefik.http.routers.websecure.tls.certresolver=mytlschallenge # <== Defining certsresolvers for https
        networks:
          - web
@@ -841,3 +841,63 @@ Traefik
    # Call address with host
    curl -H Host:whoami.docker.localhost http://127.0.0.1
    
+
+General OpenSSL Commands
+########################
+
+https://www.sslshopper.com/article-most-common-openssl-commands.html
+
+These commands allow you to generate CSRs, Certificates, Private Keys and do other miscellaneous tasks.
+
+Generate a new private key and Certificate Signing Request
+
+.. code-block:: bash
+
+    openssl req -out CSR.csr -new -newkey rsa:2048 -nodes -keyout privateKey.key
+
+Generate a self-signed certificate 
+
+.. code-block:: bash
+
+    openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout privateKey.key -out certificate.crt
+
+Generate a certificate signing request (CSR) for an existing private key
+
+.. code-block:: bash
+
+    openssl req -out CSR.csr -key privateKey.key -new
+
+Generate a certificate signing request based on an existing certificate
+
+.. code-block:: bash
+
+    openssl x509 -x509toreq -in certificate.crt -out CSR.csr -signkey privateKey.key
+
+Remove a passphrase from a private key
+
+.. code-block:: bash
+
+    openssl rsa -in privateKey.pem -out newPrivateKey.pem
+
+
+
+Check a Certificate Signing Request (CSR)
+
+.. code-block:: bash
+
+    openssl req -text -noout -verify -in CSR.csr
+
+Check a private key
+
+.. code-block:: bash
+
+    openssl rsa -in privateKey.key -check
+
+Check a certificate
+
+.. code-block:: bash
+
+    openssl x509 -in certificate.crt -text -noout
+
+
+
