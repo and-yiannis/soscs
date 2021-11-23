@@ -389,7 +389,7 @@ This tutorial is based on https://www.dionysopoulos.me/apache-mysql-php-server-o
 
 Setting up PHP
 ==============
-* Make sure that the correct version of the Microsoft Visual C++ Redistributable for Visual Studio is installed for the version of the PHP that is being installed.
+* **Make sure that the correct version of the Microsoft Visual C++ Redistributable for Visual Studio is installed for the version of the PHP that is being installed.**. Next to the php version, you can see the required VC, (e.g. vc11, vc15, etc). Search for the Microsoft Visual C++ Redistributable for Visual Studio with this code and install it. 
 * Download the PHP versions you want from http://windows.php.net/download. Choose the Non Thread Safe releases.
 * Create a folder to store the PHPs, e.g. :code:`C:\PHP`. 
 * Make one folder for each php within there, e.g. :code:`C:\PHP\5.4`, :code:`C:\PHP\7.4` etc
