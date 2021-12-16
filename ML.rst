@@ -521,3 +521,43 @@ Cross validation
 
 
 
+FBProphet
+#########
+
+Installation Instructions via pip on Windows
+********************************************
+
+While installing *FBProphet* via *Conda* is relatively straight forward, installation via *pip* requires the presence of a *C++* compiler. The following steps describe the installation of *mingw64* using *msys64* and how *FBProphet* can then be installed using *pip*.
+
+Instructions based on
+
+https://stackoverflow.com/questions/60388880/import-pystan-api-failedimporterror-dll-load-failed-the-specified-module-cou/64713567#64713567
+
+
+* Go to www.msys2.org and download the installer
+* Run the installer
+* Run :code:`Msys2 msys` (from the Start Menu)
+* In the console that opens up run `pacman -Syu`
+* Run :code:`Msys2 msys` (if the console closed)
+* Run :code:`pacman -Su`
+* Run :code:`pacman -S --needed base-devel mingw-w64-x86_64-toolchain`
+* Add the :code:`C:/path/to/msys/mingw64/bin` directory to the :code:`PATH` environment variable
+
+At this point, opening a terminal and running :code:`g++ --version` should give the version of the *C++* compiler installed.
+
+In the Python install directory, add in the folder :code:`./Lib/distutils` the file :code:`distutils.cfg` with the following contents
+
+.. code-block:: 
+
+   [build] compiler=mingw32
+   [build_ext] compiler=mingw32
+
+Then install using pip and at the end add
+
+.. code-block:: 
+
+
+  pip install pystan==2.17.1
+
+  pip install fbprophet==0.6
+

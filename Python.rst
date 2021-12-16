@@ -1508,6 +1508,23 @@ The authentication token is passed in the call in the headers of the call, which
 
     headers={"Authorization": 'Bearer ' + auth_token}
 
+
+Flask-Migrate
+#############
+
+https://flask-migrate.readthedocs.io/en/latest/
+
+.. code-block:: python
+
+  # Create migration repository
+  flask db init
+  # Create migration
+  flask db migrate -m'Initial migration'
+  # Apply migration to the database
+  flask db upgrade
+  # Help on flask db
+  flask db --help
+
 General
 #######
 
@@ -1890,22 +1907,28 @@ Windows with Anaconda
 .. code-block:: bash
 
     # Create an environment
-    conda create --name <name>
+    conda env create --name <name>
 
     # Create environment from file
     conda env create -f <filename.yml>
+
+    # Update environment from file
+    conda env update -f <filename.yml> --prune 
 
     # Activate the environment
     conda activate <name>
 
     # Deactivate the environment
-    conda deactivate <name>
+    conda deactivate 
 
     # List environments
     conda env list
 
     # Remove environment
-    conda remove --name <name> --all
+    conda env remove --name <name> --all
+
+    # List packages
+    conda list
 
 * The environments are created in :code:`C:\ProgramData\Anaconda3\envs`. It is possible to create them at a different location using the :code:`--prefix` flag of :code:`conda create`.
 * After an environment is deleted, an empty folder might be left in :code:`C:\ProgramData\Anaconda3\envs`, which can be removed manually. 
