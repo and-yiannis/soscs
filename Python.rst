@@ -1385,26 +1385,41 @@ Bokeh
 
 
 
-
-
-
-
 Decorators
 ##########
+
+**Summary**
+
+.. code-block:: python
+
+    @dec
+    def fun():
+        ...
+    # is equivalent to 
+    fun = dec(fun)
+
+    @dec(arg)
+    def fun():
+        ...
+    # is equivalent to 
+    fun = (dec(arg))(fun)
+
+
+**Simple decorators**
 
 Consider the following simple decoration example
 
 .. code-block:: python
 
     def dec(f):
-        def wrapper(*args, **kwargs):
-            result = f(*args, **kwargs)
-            return result
-        return wrapper
+      def wrapper(*args, **kwargs):
+        result = f(*args, **kwargs)
+        return result
+      return wrapper
     
     @dec
     def fun():
-        return 0
+      return 0
 
 `fun` is a function that is decorated by `dec`. The syntax 
 
@@ -1440,6 +1455,37 @@ A decorator is therefore a function that takes a function as an argument and ret
             return result
         return wrapper
 
+**Decorators with arguments**
+
+Decorators can also take arguments as in:
+
+
+.. code-block:: python
+
+   @decorator_factory(arg1)
+   def fun1(args): 
+       ...
+
+The above is equivalent to 
+
+.. code-block:: python
+
+   fun1 = (decorator_factory(arg1))(fun1)
+
+That is, :code:`decorator_factory` returns a decorator as opposed to a wrapper function as in the previous case. The implementation looks like:
+
+.. code-block:: python
+
+   def decorator_factory(argument):
+       def decorator(function):
+           def wrapper(*args, **kwargs):
+               funny_stuff()
+               something_with_argument(argument)
+               result = function(*args, **kwargs)
+               more_funny_stuff()
+               return result
+           return wrapper
+       return decorator
 
 JWT
 ###
