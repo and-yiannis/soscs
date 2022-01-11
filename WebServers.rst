@@ -900,4 +900,34 @@ Check a certificate
     openssl x509 -in certificate.crt -text -noout
 
 
+Redirection Rules
+#################
+RewriteRule Pattern Substitution
+
+The Pattern is the :code:`REQUEST_URI`. if the RewriteRule is in a virtual host, it includes the leading forward slash. If it's in a :code:`.htaccess` file, it does not.
+
+:code:`HTTP_HOST` and :code:`REQUEST_URI` examples
+
+.. code-block:: bash
+
+   http://%{HTTP_HOST}%{REQUEST_URI}
+   http://test.com/path/to/resource
+   %{HTTP_HOST} =  test.com
+   %{REQUEST_URI} = /path/to/resource
+
+If the 'Substitution' starts with :code:`http:// or https://`, then the redirection happens at this exact literal. Otherwise the 'Substitution' is appended to the original path. Examples
+
+.. code-block:: bash
+
+   RewriteRule ^(.*)$ https://test.com
+   Redirects to https://test.com
+   
+   RewriteRule ^(.*)$ somethingelse
+   Redirects to http(s)://original_host/original_uri/somethingelse
+
+
+
+:code:`%{REQUEST_FILENAME}` is the full path on the server of the file that was requested e.g.
+for :code:`http://a.com/hello.txt` the :code:`%{REQUEST_FILENAME}` is :code:`/path/in/the/server/to/hello.txt`
+
 
