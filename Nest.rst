@@ -1551,3 +1551,46 @@ Asynchronous vs Synchronous Handlers
     //  - Handling result: 1
     //  - Exiting main
 
+Modules
+#######
+
+CommonJS
+********
+
+When we :code:`require` a module,
+
+.. code-block:: javascript
+
+   x = require('./mymodule');
+
+:code:`x` takes the value of :code:`module.exports`. :code:`module.exports` is a property on :code:`module`, as it can be seen by :code:`console.log(module)`. :code:`exports` is initially an alias to :code:`module.exports`. 
+
+Therefore
+
+.. code-block:: javascript
+
+   exports.foo = 'bar'
+   module.exports.foo = 'bar'
+
+have the same effect, such that 
+
+.. code-block:: javascript
+
+   x = require('./mymodule');
+   console.log(x)
+
+will be :code:`{ foo: 'bar' }` in both cases.
+
+However, if we reassign either of the two, the link between them is lost, and the contents of :code:`module.exports` are exported:
+
+
+.. code-block:: javascript
+
+   exports = 'foo'
+   module.exports = 'bar'
+   ...
+   x = require('./mymodule')
+   console.log(x)
+ 
+the result will be :code:`bar`. 
+
