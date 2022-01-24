@@ -243,6 +243,37 @@ Networking
 
     docker network rm <network_name>
 
+Docker files
+************
+Start image
+
+.. code-block:: docker
+
+  FROM
+
+Copy the source destination (from the hard drive) to the docker.
+
+.. code-block:: docker
+
+  COPY src dest
+
+Expose port 80, the container will listen to that
+
+.. code-block:: docker
+
+  EXPOSE 80
+
+Create a python image, copying the local dir to :code:`code` and running the command :code:`python app.py`.
+
+.. code-block:: docker
+
+   FROM python:3.9-alpine
+   ADD . /code
+   WORKDIR /code
+   RUN pip install --upgrade pip
+   RUN pip install -r requirements.txt
+   CMD ["python", "app.py"]
+
 Docker-compose
 **************
 
@@ -473,37 +504,6 @@ in case this complains, delete the local cache images with docker rmi
 **Points:**
 
 * The commands :code:`build`, :code:`container_name`, :code:`restart` and a few others are ignored with :code:`docker stack deploy` and are only supported with :code:`docker-compose up` and :code:`docker-compose run`. The images that will be deployed with the stack must be prebuilt and stored in a repoistory
-
-Docker files
-************
-Start image
-
-.. code-block:: docker
-
-  FROM
-
-Copy the source destination (from the hard drive) to the docker.
-
-.. code-block:: docker
-
-  COPY src dest
-
-Expose port 80, the container will listen to that
-
-.. code-block:: docker
-
-  EXPOSE 80
-
-Create a python image, copying the local dir to :code:`code` and running the command :code:`python app.py`.
-
-.. code-block:: docker
-
-   FROM python:3.9-alpine
-   ADD . /code
-   WORKDIR /code
-   RUN pip install --upgrade pip
-   RUN pip install -r requirements.txt
-   CMD ["python", "app.py"]
 
 Docker registry
 ***************
