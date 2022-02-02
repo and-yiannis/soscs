@@ -44,6 +44,13 @@ Note: This command can only be executed from the **command prompt** and **not** 
 From there it should be easy to find details about the service.
 
 
+List and kill processes
+***********************
+
+.. code-block:: bash
+
+   tasklist
+   taskkill
 
 nssm
 ####
@@ -101,4 +108,11 @@ To manage a service:
         nssm status <servicename>
 
         nssm rotate <servicename>
+
+To See all the services running with nssm type in the powershell
+
+
+.. code-block:: bash
+
+    Get-WmiObject win32_service | ?{$_.PathName -like '*nssm*'} | select Name, DisplayName, State, PathName
 

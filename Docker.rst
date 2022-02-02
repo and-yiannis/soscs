@@ -148,6 +148,12 @@ Create a new container (syntax similar to docker run).
 
     docker logs <container_name>
 
+**Inspect a container**
+
+.. code-block:: bash
+
+    docker container inspect <container_name>
+
 Image management 
 *****************
 
