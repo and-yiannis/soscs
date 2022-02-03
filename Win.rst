@@ -25,27 +25,78 @@ The last number that will pop up is the PID
 
 2) Which service started the listening process?
 ***********************************************
-To find this we need to find the parent process of the PID that's listening in the port. This can be done with the command
+To find this we need to find the parent process of the PID that's listening in the port. This can be done in the following ways:
+
+The Command line way
+====================
 
 .. code-block:: bash
 
-    wmic process get processid,parentprocessid | findstr "PID"
+    wmic process get parentprocessid,processid | findstr "PID"
 
-The first number that will pop up is the PID of the service. 
+The result will have two columns, the first is the parentprocess id and the second the process id.
 
-Note: This command can only be executed from the **command prompt** and **not** from the *powershell*.
+The Powershell way
+==================
 
-3) Find Service based on PID
+.. code-block:: bash
+
+   Get-WmiObject win32_process | ?{$_.processId -like '*PID*'} | select Name, processId, parentprocessId, CreationDate
+
+To see all the available fields, execute
+
+.. code-block:: bash
+
+   Get-WmiObject win32_process | ?{$_.processId -like '*PID*'} | Format-List -Property *
+
+
+3) Find a service based on PID
 ****************************
+The Visual way:
+===============
 * Open the Task Manager, and go to the Services tab and find the service by PID. 
 * Right click and press 'Open Services'
 * Find the service in the Services, right click and press Properties.
 
 From there it should be easy to find details about the service.
 
+The Command line way
+====================
 
-List and kill processes
-***********************
+.. code-block:: bash
+
+   wmic service get | findstr "PID"
+
+The Powershell way
+==================
+
+.. code-block:: bash
+
+   Get-WmiObject win32_service | ?{$_.processId -like '*PID*'} | Format-List -Property *
+
+4) nssm based services
+**********************
+
+To See all the services running with nssm:
+
+The Command line way
+====================
+
+.. code-block:: bash
+
+   wmic service get | findstr "nssm"
+
+The Powershell way
+==================
+
+.. code-block:: bash
+
+    Get-WmiObject win32_service | ?{$_.PathName -like '*nssm*'} | select Name, DisplayName, State, PathName
+
+The same can be done for node processes/services
+
+5) List and kill processes
+**************************
 
 .. code-block:: bash
 
@@ -108,11 +159,4 @@ To manage a service:
         nssm status <servicename>
 
         nssm rotate <servicename>
-
-To See all the services running with nssm type in the powershell
-
-
-.. code-block:: bash
-
-    Get-WmiObject win32_service | ?{$_.PathName -like '*nssm*'} | select Name, DisplayName, State, PathName
 
