@@ -484,17 +484,21 @@ We can instead do this:
 .. code-block:: sql
 
   SELECT city, country, population
-  FROM (SELECT city, country, population,
-              @country_rank := CASE WHEN @current_country = country 
-                  THEN @country_rank+1 ELSE 1 END country_rank,
-              @current_country := country
-        FROM (SELECT @country_rank := 0) crtemp,
-             (SELECT @current_country := NULL) cctemp,
-             (SELECT *
-              FROM cities
-              ORDER BY country, population DESC
-             ) r1
-        ) r2
+  FROM (
+    SELECT 
+      city, country, population,
+      @country_rank := CASE 
+        WHEN @current_country = country THEN @country_rank+1
+        ELSE 1 
+      END country_rank,
+      @current_country := country
+    FROM (SELECT @country_rank := 0) crtemp,
+         (SELECT @current_country := NULL) cctemp,
+         (SELECT *
+          FROM cities
+          ORDER BY country, population DESC
+         ) r1
+  ) r2
   WHERE country_rank <= 2;
 
 This will return:
