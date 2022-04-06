@@ -1933,7 +1933,7 @@ Windows
 .. code-block:: bash
 
     # Create environment
-    python -m venv <env_name>
+    python -m venv <env_directory_name> [--prompt <env_name>]
 
     # Activate
     .\<env_name>\Scripts\activate
