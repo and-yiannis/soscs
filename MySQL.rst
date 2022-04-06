@@ -548,10 +548,38 @@ query as:
         ) r2
   WHERE country_rank <= 2;
 
+Foreign keys
+============
+
+The following removes and adds foreign keys between photo.userID and user.ID
+
+.. code-block:: sql
+
+    -- Add foreign keys
+    ALTER TABLE photo
+    ADD CONSTRAINT FK_photo_user
+    FOREIGN KEY (userID) REFERENCES user(ID); 
+    
+    -- Remove foreign keys
+    ALTER TABLE photo
+    DROP FOREIGN KEY FK_photo_user; 
+
 Find Foreign keys
 =================
 
-The following snippet will return for all the foreign keys in the database, the column name and the table they belong to, and the column name and table they are referencing. 
+MySQL: The will list the foreign keys pointing to a table
+
+.. code-block:: sql
+
+    SELECT 
+      TABLE_NAME,COLUMN_NAME,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,REFERENCED_COLUMN_NAME
+    FROM
+      INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+    WHERE
+      REFERENCED_TABLE_SCHEMA = '<dbName>' AND
+      REFERENCED_TABLE_NAME = '<tableName>';
+
+SQL Server: The following snippet will return for all the foreign keys in the database, the column name and the table they belong to, and the column name and table they are referencing. 
 
 .. code-block:: sql
 
@@ -568,6 +596,26 @@ The following snippet will return for all the foreign keys in the database, the 
           ON f.OBJECT_ID = fc.constraint_object_id
     WHERE 
        OBJECT_NAME(f.parent_object_id) = 'Table_Name';
+
+Profiling
+=========
+
+The following enables profiling and shows information about queries, such as run times
+
+.. code-block:: sql
+
+   
+   set @@profiling=1; -- set profile on
+
+   -- Run some queries
+
+   show profiles; -- show information about the queries that run
+   
+
+   -- The following resets the profiler
+   SET @@profiling = 0;
+   SET @@profiling_history_size = 0;
+   SET @@profiling_history_size = 100; 
 
 
 Change root password
