@@ -661,6 +661,23 @@ https://coolestguidesontheplanet.com/how-to-change-the-mysql-root-password/
     my sql -u root -p
 
 
+ER_NO_SUCH_USER: The user specified as a definer does not exist"
+================================================================
+When the definer of a stored procedure does not exist in the set of users and the :code:`security_type` of a stored procedure is set to :code:`DEFINER`, the procedure won't run. One remedy in this case is to change the security type to :code:`INVOKER` using the following:
+
+.. code-block:: sql
+
+   update mysql.proc
+   set security_type = 'INVOKER'
+   where db = '<db_name>'
+   and name = '<proc_name>'
+
+Another option is to create the user which is set as the definer of the procedure, or to add as a definer an existing user
+
+More info on the subject can be found in 
+
+https://dev.mysql.com/doc/refman/5.6/en/stored-objects-security.html
+   
 
 SQL Server
 **********
