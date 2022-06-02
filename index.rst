@@ -27,6 +27,7 @@ Table of Contents
    MySQL.rst
    ML.rst
    Nest.rst
+   OpenVPN.rst
    Python.rst
    PyTorch.rst
    R.rst
