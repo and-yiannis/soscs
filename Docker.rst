@@ -55,18 +55,24 @@ Run a command in a *new* container.
 
 *Examples*
 
-Start a new container named `my_container` from the image named `debian` exposing the port 80. The container should run in detached mode. 
+Start a new container 
+
+  * in detached mode :code:`-d`, 
+  * named :code:`my_container`, 
+  * exposing port 80 to port 80 of the host, 
+  * mounting directory :code:`/home` of the host to directory :code:`app` of the container, 
+  * based on the image debian. 
 
 .. code-block:: bash
 
-  docker run -d --name my_container -p 80:80 debian 
+  docker run -d --name my_container -p 80:80 -v /home:/app debian 
 
-
-Start interactively a new container from the image named `debian` exposing ports 80 and 443 and mounting the host's `home` directory to the container's `app`.
+Start a new container with a bash shell, to which you can later connect with :code:`exec` interactively.
 
 .. code-block:: bash
 
-  docker container run -it -p 80:80 -p 443:443 -v /home:/app debian /bin/bash
+  docker run -d -it --name debian_cont debian /bin/bash
+
 
 
 Exec

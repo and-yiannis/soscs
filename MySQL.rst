@@ -678,6 +678,15 @@ More info on the subject can be found in
 
 https://dev.mysql.com/doc/refman/5.6/en/stored-objects-security.html
    
+The definers for functions and procedures can also be accessed via the :code:`INFORMATION_SCHEMA.ROUTINES` table. Similar information for views, can be accessed by the :code:`INFORMATION_SCHEMA.VIEWS` table.
+
+.. code-block:: sql
+
+   select * from information_schema.routines 
+   where routine_schema = <db_name>;
+
+   select * from information_schema.views 
+   where table_schema = <db_name>;
 
 SQL Server
 **********

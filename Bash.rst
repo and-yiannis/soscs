@@ -488,6 +488,66 @@ and once logged on to server1 we typed
 
 For this to happen without passwords, you'd need to have :code:`id_rsa` in :code:`~/.ssh` of the client machine and server1, and :code:`id_rsa.pub` to be copied in the :code:`~/.ssh/authorized_keys` of server1 and server2.
 
+SSHD setup
+==========
+
+Below are some common setup parameters for ssh. The following applies for Debian based distros.
+
+Keep a copy of the :code:`/etc/ssh/sshd_config` file in case something goes wrong
+
+Refer also to 
+
+https://www.a2hosting.com/kb/getting-started-guide/accessing-your-account/disabling-ssh-logins-for-root 
+
+and 
+
+https://www.a2hosting.com/kb/getting-started-guide/accessing-your-account/changing-the-ssh-server-port-number
+
+* Changing ssh port
+
+Open the :code:`/etc/ssh/sshd_config` file circa line 16 and add/modify
+
+.. code-block:: bash
+
+   Port <new_port_number>
+
+* Disabling root access
+
+Open the :code:`/etc/ssh/sshd_config` file circa line 35 and add/modify
+
+.. code-block:: bash
+
+   PermitRootLogin no
+
+* Add users to ssh 
+
+Create a user with sudo privileges if it does not exist already
+
+.. code-block:: bash
+
+   add user username
+   apt-get install sudo
+   usermod -a -G sudo username
+
+
+Open the :code:`/etc/ssh/sshd_config` file circa line 35 and add/modify
+
+.. code-block:: bash
+
+   AllowUsers username
+
+
+When done, run
+
+.. code-block:: bash
+
+   sudo service ssh restart
+
+
+When done, try connecting using the new configuration, without closing the ssh terminal you are using to make the changes. This way you can verify that the new configuration works, and avoid getting locked out if the configuration fails. 
+
+
+
 Various
 =======
 

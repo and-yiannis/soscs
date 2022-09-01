@@ -841,6 +841,70 @@ Traefik
    # Call address with host
    curl -H Host:whoami.docker.localhost http://127.0.0.1
    
+Traefik with Let's encrypt
+**************************
+To obtain Let's Encrypt SSL certificates with Traefik:
+
+Add the following in the :code:`traefik` service
+
+.. code-block:: yaml
+
+  traefik:
+    command:
+      ....
+      - --certificatesresolvers.acmeresolver.acme.email=<email_address>
+      - --certificatesresolvers.acmeresolver.acme.storage=/etc/traefik/acme/acme.json
+      - --certificatesresolvers.acmeresolver.acme.httpchallenge.entrypoint=web
+
+This creates a certificate resolver named :code:`acmeresolver`, that is linked to the :code:`web` entrypoint, and stores the certificate in :code:`/etc/traefik/acme/acme.json`. The :code:`web` entrypoint should listen to the port 80, to enable the :code:`httpChallenge`.
+
+You might also want to mount the :code:`/etc/traefik/acme/` directory, so that the certificates are available on the host. This can be done by adding
+
+.. code-block:: yaml
+
+  traefik:
+    volumes:
+      ....
+      - "./path/to/acme/on/host:/etc/traefik/acme"
+
+
+To allow certificate generation for a specific service, you should add in the CLI mode
+
+.. code-block:: yaml
+
+  <service_name>:
+    deploy:
+      labels:
+        ...
+        - traefik.http.routers.<secure-router-name>.tls=true
+        - traefik.http.routers.<secure-router-name>.tls.certresolver=acmeresolver
+
+In the YAML mode this can be 
+
+.. code-block:: yaml
+
+    http:
+      routers:
+        <secure-router-name>:
+          ...
+          tls:
+            certResolver: acmeresolver
+
+Some extra points:
+
+* When testing you should use the staging server by adding in traefik's configuration
+
+.. code-block:: yaml
+
+  traefik:
+    command:
+      ....
+      - --certificatesresolvers.myresolver.acme.caserver=https://acme-v02.api.letsencrypt.org/directory
+
+This line can be removed when you're ready to go to production
+
+
+* If the :code:`/etc/traefik/acme/acme.json` is mounted on the host and you are experiencing problems with certificate generation, deleting this file and restarting Traefik can help.
 
 General OpenSSL Commands
 ########################
