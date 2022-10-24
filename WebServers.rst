@@ -964,6 +964,17 @@ Check a certificate
     openssl x509 -in certificate.crt -text -noout
 
 
+Check if a certificate and a private key match
+
+.. code-block:: bash
+
+    openssl rsa -noout -modulus -in server.key | openssl md5
+    openssl x509 -noout -modulus -in server.crt | openssl md5
+
+The resulting hashes must match.
+
+
+
 Redirection Rules
 #################
 RewriteRule Pattern Substitution
