@@ -906,6 +906,27 @@ Chapter 11
         df1.align(df2, join='inner')
             aligns frames according to index 
 
+Indexing
+********
+
+Use :code:`loc` and :code:`iloc` for indexing
+
+.. code-block:: python
+
+  # index by labels
+  df.loc['label1', 'label2'] 
+  # index by position (integers)
+  df.iloc[index1, label2]
+
+
+For getting and setting single elements, :code:`at` and :code:`iat` is much faster.
+
+.. code-block:: python
+
+  # indexing single elements by label
+  df.at['label1', 'label2'] 
+  # indexing single elements by position (integers)
+  df.iloc[index1, label2]
 
 
 Display options

@@ -554,6 +554,12 @@ List images in the registry
 
     curl -X GET http://localhost:5000/v2/_catalog
 
+Get all tags for an image
+
+.. code-block:: bash
+
+    curl -X GET http://localhost:5000/v2/<image_name>/tags/list
+
 Delete local copies
 
 .. code-block:: bash

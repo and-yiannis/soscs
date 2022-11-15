@@ -1005,4 +1005,97 @@ If the 'Substitution' starts with :code:`http:// or https://`, then the redirect
 :code:`%{REQUEST_FILENAME}` is the full path on the server of the file that was requested e.g.
 for :code:`http://a.com/hello.txt` the :code:`%{REQUEST_FILENAME}` is :code:`/path/in/the/server/to/hello.txt`
 
+Let's Encrypt with Win-acme
+###########################
 
+These are instruction installing Let's encrypt ssl certificates on Apache2.4 using win-acme. The instructions were taken from 
+
+https://www.snel.com/support/install-lets-encrypt-with-apache-on-windows-server-2019/
+
+and 
+
+https://www.naturalborncoder.com/linux/2021/01/27/how-to-setup-lets-encrypt-for-apache-on-windows/
+
+Create a script called RestartApache.bat with the following line of code
+
+.. code-block:: bash
+
+  net stop "Apache2.4" & sc start "Apache2.4" 
+
+Assuming the Apache service is called ``Apache2.4``
+
+
+Download the win-acme program from https://www.win-acme.com/, and run it.
+
+
+Answer the questions as follows:
+
+*  *Please choose from the menu :*  Create certificate (full options)
+*  *Enter comma separated list of host names, starting with the common name* : <Enter the domain name>
+*  *Suggested friendly name* :  <Enter>
+*  *How would you like prove the ownership for the domain(s)?* : Save verificateion files on (network) path
+*  *Path to the root of the site that will handle authentication* : <Give the path to the root folder of the domain>
+*  *Copy default web.config before validation?* : <no>
+*  *What kind of private key should be used for the certificate?* : RSA key
+*  *How would you like to store the certificate?* : PEM encoded files (Apache, nginx, etc.)
+*  *Path to folder where .pem files are stored* : <give path>
+*  *Would you like to store it in another way too?* : no (additional) store steps
+*  *Which installation step should run first?* : Start external script or program
+*  *Enter the path to the script that you want to run after renewal* : <path to RestartApache.bat script>
+*  *Enter the parameter format string for the script, e.g. "....* : <Enter>
+*  *Which installation step should run first?* : No (additional) installation steps
+*  *Open in default application?* : no
+*  *Do you agree with the terms?* : yes
+*  *Enter email(s) for notifications about problems...* : <enter email>
+
+
+Also, change the following Apache configurations:
+
+
+This 
+
+.. code-block:: bash
+
+   SSLCipherSuite HIGH:MEDIUM:!MD5:!RC4:!3DES
+   SSLProxyCipherSuite HIGH:MEDIUM:!MD5:!RC4:!3DES
+
+to this 
+
+.. code-block:: bash
+
+
+  SSLCipherSuite ECDH+AESGCM256:ECDH+CHACHA20:DH+AESGCM256:ECDH+AES256:DH+AES256:!aNULL:!MD5:!DSS
+  SSLProxyCipherSuite ECDH+AESGCM256:ECDH+CHACHA20:DH+AESGCM256:ECDH+AES256:DH+AES256:!aNULL:!MD5:!DSS
+
+and this
+
+.. code-block:: bash
+
+  SSLProtocol all -SSLv3
+  SSLProxyProtocol all -SSLv3
+
+to this
+
+.. code-block:: bash
+
+  SSLProtocol all -SSLv3 -TLSv1 -TLSv1.1
+  SSLProxyProtocol all -SSLv3 -TLSv1 -TLSv1.1
+
+and add the generated certificates and keys to the apache configuration. 
+
+Finally, restart the Apache server.
+
+Notes
+*****
+
+* Various configurations can be found on ``C:\ProgramData\win-acme``
+
+* If there are any redirects, e.g. from http to https, they should be written with the trailing slash, e.g. 
+
+.. code-block:: bash
+
+   Redirect permanent / https://domain.name.com/ 
+   # and not
+   Redirect permanent / https://domain.name.com 
+
+so that the path to the ``.well-known`` folders is formed correctly.
