@@ -1592,6 +1592,198 @@ https://flask-migrate.readthedocs.io/en/latest/
   # Help on flask db
   flask db --help
 
+
+SQL Alchemy
+###########
+
+**Select All**
+
+.. code-block:: python
+
+  db.session.execute(
+    select(model)
+  ).all()
+
+  # Alternative method
+  model.query.filter_by(
+     ID=id, name=name
+  ).all()
+
+**Select One**
+
+.. code-block:: python
+
+  db.session.execute(
+    select(model)
+  ).first()
+
+
+**Conditional Selects**
+
+
+.. code-block:: python
+
+  # Multiple where 
+  db.session.execute(
+    select(
+      model.column1,
+      model.column2,
+    ).where(
+      model.column3 == value1
+    ).where(
+      model.column4 == value2
+    )
+  ).all()
+
+**Ordering**
+
+.. code-block:: python
+
+
+  # Order by descending
+  db.session.execute(
+    select(
+      model.column1,
+      model.column2,
+    ).order_by(
+      model.column5.amount.desc()
+    )
+  ).all()
+
+**Select In**
+
+.. code-block:: python
+
+  db.session.execute(
+    select(
+      model.column1,
+    ).where(
+      model.column3.in_(product_id)
+    )
+  ).all()
+
+**Labels**
+
+.. code-block:: python
+
+  db.session.execute(
+    select(
+      model.column_name.label('column_label')
+    )
+  ).all()
+
+**Joins**
+
+.. code-block:: python
+
+  db.session.execute(
+    select(
+      model1.column_name,
+      model2.column_name,
+    ).join(
+        model2, model1.join_column == model2.join_column
+    ).join(
+      model3, and_(model3.join_column == model1.join_column,
+                   model3.join_column == model2.join_column)
+    ).where(
+      model1.column == 'value'
+    )
+  ).all()
+
+**Inserting**
+
+.. code-block:: python
+
+  db.session.add_all(predictions) # List of objects
+  db.session.add(ordering_supplier) # Single object
+
+**Updating**
+
+.. code-block:: python
+
+  db.session.execute(
+    update(model).
+    where(model.ID == 'value').
+    values(
+      col_1='val1',
+      col_2='val2',
+      col_3='val3',
+    )
+  )
+
+**Deleting**
+
+.. code-block:: python
+
+  db.session.execute(delete(WRHPosition))
+
+  db.session.execute(
+    delete(
+      model
+    ).where(
+      model.ID == 'valueid'
+    ).where(
+      model.name.in_(['array', 'of', 'values'])
+    )
+  )
+
+**scalars vs execute**
+
+Consider the following:
+
+.. code-block:: python
+
+  query =  select(
+      model.column1.label('column1'),
+      model.column2.label('column2'),
+    )
+  res1 = db.session.execute(query).all()
+  res2 = db.session.scalars(query).all()
+
+:code:`res1` will be a list of :code:`sqlalchemy.engine.row.Row` objects, similar to dictionaries, i.e.
+
+.. code-block:: python
+
+  res1 = [
+    ('column1_value_1', 'column2_value_1'),
+    ('column1_value_2', 'column2_value_2'), ...
+  ]
+while :code:`res2` will be just the first value of each row (scalar)
+
+.. code-block:: python
+
+  res1 = [
+    'column1_value_1',
+    'column1_value_2'
+  ]
+
+However, for the following query
+
+
+.. code-block:: python
+
+  query =  select(model)
+
+:code:`res1` will be a list of tuples whose first element is the model, e.g.
+
+.. code-block:: python
+
+  res1 = [
+    ('model', ),
+    ('model', ),
+  ]
+
+but res2 will be a list of model objects
+
+.. code-block:: python
+
+  res1 = [
+    'model',
+    'model',
+  ]
+
+
+
 General
 #######
 
@@ -1852,53 +2044,59 @@ A list of integers can be turned to bytes with :code:`bytes()`
 Bitwise operations 
 ##################
 
+.. code-block::
 
-
-bin() 
-    returns the binary form of a number
-hex() 
-    returns the hexadecimal form of a number
-int(x, base=y)
-    converts the number from base y to base 10
-~
-    negation of a number
-<<
-    left shift
->> 
-    right shift
-^
-    bitwise xor
-&
-    bitwise and 
-|   
-    bitwise or
+  bin() 
+      returns the binary form of a number
+  hex() 
+      returns the hexadecimal form of a number
+  int(x, base=y)
+      converts the number from base y to base 10
+  ~
+      negation of a number
+  <<
+      left shift
+  >> 
+      right shift
+  ^
+      bitwise xor
+  &
+      bitwise and 
+  |   
+      bitwise or
 
 
 Short circuit evaluation
 ########################
 
-'and' and 'or' are short circuit operators: if the first operand suffices to 
+:code:`and` and :code:`or` are short circuit operators: if the first operand suffices to 
 determine the expression, the second is not evaluated
-'&' and '|'    are eager operators: both are evaluated anyway.
+:code:`&` and :code:`|`  are eager operators: both are evaluated anyway.
 
 Example
-x = 0
 
-if x > 0 and int(3/x) > 0 : 
-    print("ok")
-# Works, int(3/x) > 0 never gets evaluated, x > 0 is enough 
-to determine that the whole expression is false
+.. code-block:: python
 
-if x > 0 & int(3/x) > 0 :
-    print("ok")
-# Does not work, int(3/x) > 0 gets executed anyway and raises an error.
+  x = 0
+  
+  if x > 0 and int(3/x) > 0 : 
+      print("ok")
+  # Works, int(3/x) > 0 never gets evaluated, x > 0 is enough 
+  to determine that the whole expression is false
+  
+  if x > 0 & int(3/x) > 0 :
+      print("ok")
+  # Does not work, int(3/x) > 0 gets executed anyway and raises an error.
 
 
 print formatting
 ################
 
-np.set_printoptions(threshold=np.nan)
-pd.options.display.float_format = '{:,.2f}'.format
+
+.. code-block:: python
+
+  np.set_printoptions(threshold=np.nan)
+  pd.options.display.float_format = '{:,.2f}'.format
 
 
 line profiler
