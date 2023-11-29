@@ -286,6 +286,33 @@ Create a python image, copying the local dir to :code:`code` and running the com
    RUN pip install -r requirements.txt
    CMD ["python", "app.py"]
 
+Docker volumes
+**************
+
+**Create a volume**
+
+.. code-block:: bash
+
+    docker volume create <vol_name>
+
+**List volumes**
+
+.. code-block:: bash
+
+    docker volume ls
+
+**Inspect a volume**
+
+.. code-block:: bash
+
+    docker volume inspect <vol_name>
+
+**Remove a volume**
+
+.. code-block:: bash
+
+    docker volume rm <vol_name>
+
 Docker-compose
 **************
 

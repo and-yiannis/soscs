@@ -281,7 +281,7 @@ https://www.sitepoint.com/how-to-install-apache-on-windows/
 * Make sure no one is listening on port 80 (IIS)
 * Visit www.apachelounge.com/download
 * As per the instructions, download Visual Studio C++ 2019 aka VS16 from the link found in the page, (https://aka.ms/vs/16/release/VC_redist.x64.exe) and install
-* Download Apache from www.apachelounge.com/download
+* Download Apache from https://www.apachelounge.com/download 
 * Extract the Apache2x directory in the location you want to install the webserver. 
 
 Setting up 
