@@ -600,6 +600,18 @@ Get it back from the registry
 
     docker pull localhost:5000/my-ubuntu
 
+Compare an image on the docker host with a version from the registry
+====================================================================
+
+This can be achieved by fetching the image's digest from the registry and comparing it to the IMAGE ID field of the :code:`docker image ls` command for that image. The image's digest can be fetched from the registry using the following command:
+
+.. code-block:: bash
+
+  curl -u <username> -i -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+    https://<registry.address>/v2/<image_name>/manifests/<image_tag>
+
+The digest is found in the config.digest field. If the two digests match, then the image in the docker host is the same as that in the registry.
+
 Create a local registry 
 ========================
 
@@ -859,4 +871,16 @@ Info available in:
 .. code-block:: bash
 
     sudo chmod +x /usr/local/bin/docker-compose
+
+Docker and UFW
+**************
+
+UFW is a popular iptables front end on Ubuntu that makes it easy to manage firewall rules. But when Docker is installed, Docker bypass the UFW rules and the published ports can be accessed from outside. The page https://github.com/chaifeng/ufw-docker offers a method of alleviating this problem. After implementing this method, accessing the containers' ports from the server's public IP address is not possible unless the appropriate route is allowed. This can be done using 
+
+.. code-block:: bash
+
+  sudo ufw route allow from any to any port 3393
+
+More details can be found in the webpage mentioned above.
+
 
