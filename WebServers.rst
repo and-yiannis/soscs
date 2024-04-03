@@ -1030,23 +1030,26 @@ Download the win-acme program from https://www.win-acme.com/, and run it.
 
 Answer the questions as follows:
 
-*  *Please choose from the menu :*  Create certificate (full options)
-*  *Enter comma separated list of host names, starting with the common name* : <Enter the domain name>
-*  *Suggested friendly name* :  <Enter>
-*  *How would you like prove the ownership for the domain(s)?* : Save verificateion files on (network) path
-*  *Path to the root of the site that will handle authentication* : <Give the path to the root folder of the domain>
-*  *Copy default web.config before validation?* : <no>
-*  *What kind of private key should be used for the certificate?* : RSA key
-*  *How would you like to store the certificate?* : PEM encoded files (Apache, nginx, etc.)
-*  *Path to folder where .pem files are stored* : <give path>
-*  *Would you like to store it in another way too?* : no (additional) store steps
-*  *Which installation step should run first?* : Start external script or program
-*  *Enter the path to the script that you want to run after renewal* : <path to RestartApache.bat script>
-*  *Enter the parameter format string for the script, e.g. "....* : <Enter>
-*  *Which installation step should run first?* : No (additional) installation steps
-*  *Open in default application?* : no
-*  *Do you agree with the terms?* : yes
-*  *Enter email(s) for notifications about problems...* : <enter email>
+*  Please choose from the menu :*  Create certificate (full options)
+*  How shall we determine the domains to include in the certificate: Manual input
+*  Host: <the domain for which the certificate is required>
+*  Friendly Name: <Enter>
+*  Would you like to split this source into multiple certificates?: Single certificate
+*  How would you like prove the ownership for the domain(s)?* : Save verificateion files on (network) path
+*  Path: <Give the path to the root folder of the domain>
+*  Copy default web.config before validation?* : <no>
+*  What kind of private key should be used for the certificate?* : RSA key
+*  How would you like to store the certificate?* : PEM encoded files (Apache, nginx, etc.)
+*  Path to folder where .pem files are stored* : <give path>
+*  Password: None
+*  Would you like to store it in another way too?* : no (additional) store steps
+*  Which installation step should run first?* : Start external script or program
+*  Enter the path to the script that you want to run after renewal* : <path to RestartApache.bat script>
+*  Enter the parameter format string for the script, e.g. "....* : <Enter>
+*  Which installation step should run first?* : No (additional) installation steps
+*  Open in default application?* : no
+*  Do you agree with the terms?* : yes
+*  Enter email(s) for notifications about problems...* : <enter email>
 
 
 Also, change the following Apache configurations:
