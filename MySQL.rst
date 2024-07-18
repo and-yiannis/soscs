@@ -41,7 +41,7 @@ Dump database
 
 .. code-block:: bash
 
-  mysqldump -u <username> -p --max_allowed_packet=512M <db_name> > backup-file.sql
+  mysqldump -u <username> -p --max_allowed_packet=512M --routines --triggers <db_name> > backup-file.sql
 
 Load from dump
 
