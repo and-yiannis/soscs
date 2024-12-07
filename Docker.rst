@@ -769,6 +769,18 @@ The following will save a running container as an image.
 
    docker commit <container_id> <image/name>
 
+Cannot delete docker conainers!!
+=================================
+Sometimes the docker daemon loses contact with the containers that continue to run in the background. This can be due to :code:`apparmor` running. Disabling it and restarting docker and its daemon can fix the problem
+
+.. code-block:: bash
+
+  sudo apt-get purge --auto-remove apparmor
+  sudo systemctl restart docker.socket
+  sudo systemctl restart docker
+
+More info on this in https://forums.docker.com/t/can-not-stop-docker-container-permission-denied-error/41142/5
+
 
 Docker installation on Centos 8
 *******************************

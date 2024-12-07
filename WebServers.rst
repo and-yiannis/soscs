@@ -906,6 +906,54 @@ This line can be removed when you're ready to go to production
 
 * If the :code:`/etc/traefik/acme/acme.json` is mounted on the host and you are experiencing problems with certificate generation, deleting this file and restarting Traefik can help.
 
+Block using ip addresses
+**************************
+The commands below block all ip addresses from viewing a domain apart from those in the whitelist
+
+.. code-block:: yaml
+
+  http:
+    routers:
+      app:
+        entryPoints:
+          - web
+        rule: "Host(`app.domain.com`)"
+        middlewares:
+          - "mymiddleware"
+        service: myapp
+
+    middlewares:
+      mymiddleware:
+        ipWhiteList:
+          sourceRange:
+            - "123.168.243.25"
+            - "214.i238.7.96"
+
+In terms of labels, this can be written as
+
+.. code-block:: bash
+
+  - traefik.http.routers.app.middlewares=mymiddleware
+  - "traefik.http.middlewares.mymiddleware.ipWhiteList.sourceRange=123.168.243.25, 214.i238.7.96"
+            
+Call redirection
+**************************
+
+The following redirects all calls to https://mydomain.com/results to https://www.google.com.
+
+.. code-block:: bash
+
+  - traefik.http.routers.app.middlewares=m1
+  - traefik.http.middlewares.m1.redirectregex.permanent=true
+  - traefik.http.middlewares.m1.redirectregex.regex=^https://mydomain.com/results(.*)
+  - traefik.http.middlewares.m1.redirectregex.replacement=https://www.google.com
+
+
+
+
+
+
+
 General OpenSSL Commands
 ########################
 
